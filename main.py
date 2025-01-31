@@ -125,7 +125,7 @@ class TextPlayer(PlayerBase):
                     return col if 0 <= col < game.cols and game.board[0][col] == '.' else None
                 else:
                     row, col = map(int, text_guess.split())
-                    return (row, col) if 0 <= row < game.board_size and 0 <= col < game.board_size and game.board[row][col] == " " else None
+                    return (row, col) if 0 <= row < game.board_size and 0 <= col < game.board_size and game.board[row][col] == "~" else None
             except (ValueError, IndexError):
                 # If input parsing fails or doesn't meet the criteria, inform the player and allow another attempt
                 self.collect_message("Invalid input. Please enter the column number for ConnectFour or row and column numbers separated by a space for other games.")
