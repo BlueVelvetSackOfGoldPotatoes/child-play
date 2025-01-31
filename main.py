@@ -225,7 +225,7 @@ def run_game_series(game_instance, player1, player2, num_games, max_invalid_atte
 
     return results, all_game_messages, all_game_logs
 
-def play_one_game(game_instance, player1, player2, size, max_invalid_attempts=1, debug=False):
+def play_one_game(game_instance, player1, player2, size, max_invalid_attempts=1, debug=False, message_callback=None):
     game_instance.reset_board()
     
     players = [player1, player2]
@@ -239,6 +239,8 @@ def play_one_game(game_instance, player1, player2, size, max_invalid_attempts=1,
     def collect_game_message(message):
         """Collects or prints game-related messages based on debug mode."""
         game_messages.append(message)
+        if message_callback:
+            message_callback(message)
         if debug:
             print(message)
 
