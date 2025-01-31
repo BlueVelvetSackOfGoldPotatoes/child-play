@@ -6,6 +6,7 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import time
 import pandas as pd
+import asyncio
 
 from scripts_games.connectfour import ConnectFour
 from scripts_games.battleship import BattleShip
@@ -57,7 +58,7 @@ class LLMPlayer(PlayerBase):
             print("-" * 60)
         print("=" * 50)
 
-    def make_guess(self, game, previous_play):
+    async def make_guess(self, game, previous_play):
         api_messages = [{"role": "system", "content": f"You are a player in a game of {self.game.name}. {self.game.prompt}."}]
         current_state = game.get_text_state(None)
         prompt = f"Player {self.player_id + 1} ({self.player_name}), it's your turn. Here's the current game state:\n{current_state}\nMy move is: "
@@ -109,10 +110,10 @@ class TextPlayer(PlayerBase):
         super().__init__(player_id, name, debug)
         self.callback = callback
 
-    def make_guess(self, game, previous_play=""):
+    async def make_guess(self, game, previous_play=""):
         while True:  # This loop is for interactive attempts, not for re-tries in `play_one_game`
             instruction = f"\nEnter your move: "
-            text_guess = self.callback(instruction)  # This calls console_callback for input
+            text_guess = await self.callback(instruction)  # This calls console_callback for input
 
             try:
                 # Attempt to parse the input according to the expected format
@@ -141,7 +142,7 @@ class RandomPlayer(PlayerBase):
     def __init__(self, player_id, name, debug=False):
         super().__init__(player_id, name, debug)
 
-    def make_guess(self, game, previous_play=""):
+    async def make_guess(self, game, previous_play=""):
         if game.name == "shapes":
             guess = random.randint(0, 3)
             print(f"[RandomPlayer] Chose shape index: {guess}")
@@ -177,7 +178,7 @@ class RandomPlayer(PlayerBase):
                 print("[RandomPlayer] No available Battleship moves to choose.")
                 return None
 
-def run_game_series(game_instance, player1, player2, num_games, max_invalid_attempts, size, debug=False):
+async def run_game_series(game_instance, player1, player2, num_games, max_invalid_attempts, size, debug=False):
     """
     Run a series of games between an LLM player and a random player,
     tallying the results and collecting messages at the end.
@@ -202,7 +203,7 @@ def run_game_series(game_instance, player1, player2, num_games, max_invalid_atte
             print(f"\n=== Starting Game {i + 1} ===")
             print(f"{'='*50}")
         game_instance.reset_board()
-        game_messages, wrong_moves, game_log, player = play_one_game(game_instance, player1, player2, size, max_invalid_attempts, debug=debug)
+        game_messages, wrong_moves, game_log, player = await play_one_game(game_instance, player1, player2, size, max_invalid_attempts, debug=debug)
         all_game_messages.append(game_messages)
         all_game_logs.extend(game_log)  # Append the move log from each game
 
@@ -230,7 +231,7 @@ def run_game_series(game_instance, player1, player2, num_games, max_invalid_atte
 
     return results, all_game_messages, all_game_logs
 
-def play_one_game(game_instance, player1, player2, size, max_invalid_attempts=1, debug=False, message_callback=None):
+async def play_one_game(game_instance, player1, player2, size, max_invalid_attempts=1, debug=False, message_callback=None):
     game_instance.reset_board()
     
     players = [player1, player2]
@@ -261,7 +262,7 @@ def play_one_game(game_instance, player1, player2, size, max_invalid_attempts=1,
         collect_game_message(f"{current_player.name}'s turn to guess.")
         print(f"\n[Turn {turn + 1}] {current_player.name}'s turn.")
 
-        guess = current_player.make_guess(game_instance, previous_play)
+        guess = await current_player.make_guess(game_instance, previous_play)
 
         previous_play = guess
 
@@ -344,7 +345,7 @@ def play_one_game(game_instance, player1, player2, size, max_invalid_attempts=1,
     # Fallback return in case game_over is not set correctly
     return game_messages, wrong_moves, move_log, -1
 
-def play_random_moves(game, iter, debug=False):
+async def play_random_moves(game, iter, debug=False):
     players = [RandomPlayer(0, "Random 1", debug=debug), RandomPlayer(1, "Random 2", debug=debug)]
     current_player_index = 0
     game_dataset = []
@@ -355,7 +356,7 @@ def play_random_moves(game, iter, debug=False):
 
         valid_move_made = False
         while not valid_move_made and not game.game_over:
-            guess = current_player.make_guess(game)
+            guess = await current_player.make_guess(game)
             valid_move_made = game.guess(current_player_index, guess, current_player)
             game_state = game.get_text_state(current_player_index)
 
@@ -383,11 +384,11 @@ def load_from_json(filename):
     with open(filename, 'r') as file:
         return json.load(file)
 
-def generate_game_dataset(game, moves_per_game, num_games):
+async def generate_game_dataset(game, moves_per_game, num_games):
     all_games_dataset = []
 
     for _ in range(num_games):
-        game_dataset = play_random_moves(game, moves_per_game)
+        game_dataset = await play_random_moves(game, moves_per_game)
         all_games_dataset.extend(game_dataset)
 
     return all_games_dataset
@@ -484,7 +485,7 @@ def load_and_aggregate_logs(path):
                     aggregated_logs.extend(logs)
     return aggregated_logs
 
-def main():
+async def main():
 
     debug = True  # Ensure debug mode is enabled to see model outputs
     game_runs = []
@@ -637,7 +638,7 @@ def main():
             player2 = RandomPlayer(1, "Random", debug=debug)
             num_games = game['num_games']
 
-            results, all_game_messages, all_game_logs = run_game_series(game_instance, player1, player2, num_games, 1, game['board_size'], debug)
+            results, all_game_messages, all_game_logs = await run_game_series(game_instance, player1, player2, num_games, 1, game['board_size'], debug)
 
             save_dataset_to_json(results, os.path.join(folder_name, f'results_{game["game_name"]}.json'))
             save_dataset_to_json(all_game_messages, os.path.join(folder_name, f'game_messages_{game["game_name"]}.json'))
@@ -688,4 +689,4 @@ def main():
         print("Bar plots generated for shapes experiments.")
 
 if __name__ == "__main__":
-    main()
+    asyncio.run(main())
