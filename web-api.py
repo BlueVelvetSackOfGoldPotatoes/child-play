@@ -13,6 +13,7 @@ class GameWrapper:
         self.callback = callback
         
         self.game_messages = []
+        self.finished = False
         
         self.awaiting_guess = None
         self.guess_event = asyncio.Event()
@@ -46,6 +47,7 @@ class GameWrapper:
         
     async def start(self):
         await play_one_game(self.game_instance, self.player1, self.player2, None, message_callback=self.collect_game_message)
+        self.finished = True
         
     def guess(self, guess):
         if self.awaiting_guess is None:
@@ -81,19 +83,26 @@ async def create_empty_game(game_name: str):
     
     return {"id": id}
 
-@app.get("/games/{id}/messages")
-async def get_game(id: str):
+@app.get("/games/{id}")
+def get_game(id: str):
     if id not in games:
         raise ValueError(f"Unknown game: {id}")
     
-    return games[id].game_messages
+    return {
+        "finished": games[id].finished,
+        "messages": games[id].game_messages
+    }
 
 @app.get("/games/{id}/current")
-async def get_game_current(id: str):
+def get_game_current(id: str):
     if id not in games:
         raise ValueError(f"Unknown game: {id}")
     
+    if games[id].awaiting_guess is None:
+        return None
+    
     (player_id, messages, prompt) = games[id].awaiting_guess
+    
     return {
         "player_id": player_id,
         "messages": messages,
@@ -101,8 +110,11 @@ async def get_game_current(id: str):
     }
 
 @app.post("/games/{id}")
-async def make_guess(id: str, guess: str):
+def make_guess(id: str, guess: str):
     if id not in games:
         raise ValueError(f"Unknown game: {id}")
+    
+    if games[id].finished:
+        raise ValueError(f"Game is finished: {id}")
     
     games[id].guess(guess)
