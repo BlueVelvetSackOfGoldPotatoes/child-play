@@ -44,6 +44,8 @@ async def main():
     #     }
     # ]
     
+    print(game.text_state)
+    
     print("winner", game.winner)
     # None (if game not finished), "tie", "custom", "opponent" or "random"
     
