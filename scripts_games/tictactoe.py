@@ -1,5 +1,6 @@
 from ast import List
 import random
+import copy
 
 class TicTacToe:
     def __init__(self, options=None):
@@ -38,26 +39,71 @@ class TicTacToe:
 
     def guess(self, index, guess, playerobj):
         """Processes a player's guess, treating it as a move in TicTacToe."""
+
         row, col = guess
         if not (0 <= row < self.board_size and 0 <= col < self.board_size):
-            return "Invalid move. Out of board range.", False
+            return "Invalid move. Out of board range.", False, None
         if self.board[row][col] != " ":
-            return "Invalid move. Position already taken.", False
+            return "Invalid move. Position already taken.", False, None
         
+        previous_board = copy.deepcopy(self.board)
         self.board[row][col] = "X" if index == 0 else "O"
 
         if self.check_win():
             self.game_over = True
-            return "Win", True
+            return "Win", True, 1.0
         if self.check_tie():
             self.game_over = True
-            return "Tie", True
-        self.switch_player()
-        return "Valid move", True
+            return "Tie", True, 0.5
 
-    def check_win(self) -> bool:
+        self.switch_player()
+        score = self.calculate_score(previous_board, guess, index)
+        return "Valid move", True, score
+    
+    def calculate_score(self, previous_board, guess, player_index):
+        """Calculates the score of a move based on its impact."""
+        row, col = guess
+        symbol = "X" if player_index == 0 else "O"
+        opponent_symbol = "O" if symbol == "X" else "X"
+        score = 0.0
+        
+        new_board = copy.deepcopy(previous_board)
+        new_board[row][col] = symbol
+        
+        winning = self.check_win(new_board, player_index)
+        if winning: return 1.0
+
+        losing = self.check_win(new_board, 1 - player_index)
+        if losing: return 0.0
+        
+        directions = [
+            [(row + i, col) for i in range(-1, 2) if 0 <= row + i < self.board_size],  # Vertical
+            [(row, col + i) for i in range(-1, 2) if 0 <= col + i < self.board_size],  # Horizontal
+            [(row + i, col + i) for i in range(-1, 2) if 0 <= row + i < self.board_size and 0 <= col + i < self.board_size],  # Diagonal \
+            [(row + i, col - i) for i in range(-1, 2) if 0 <= row + i < self.board_size and 0 <= col - i < self.board_size]  # Diagonal /
+        ]
+        
+        for line in directions:
+            symbols = [new_board[r][c] for r, c in line]
+            if symbols.count(opponent_symbol) == 2 and symbols.count(" ") == 1:
+                score += 0.4  # Blocking opponent
+            if symbols.count(symbol) == 2 and symbols.count(" ") == 1:
+                score += 0.3  # Creating two in a row
+        
+        if score > 0.9:
+            score = 0.9
+        
+        return score
+
+    def check_win(self, board=None, player_index=None) -> bool:
         """Checks if the current player has won the game."""
-        symbol = "X" if self.current_player == "P1" else "O"
+
+        if board is None:
+            board = self.board
+        if player_index is None:
+            player_index = 0 if self.current_player == "P1" else 1
+        
+        symbol = "X" if player_index == 0 else "O"
         win_conditions = [
             [(i, j) for i in range(self.board_size)] for j in range(self.board_size)  # Vertical
         ] + [
@@ -68,7 +114,7 @@ class TicTacToe:
         ]
 
         for condition in win_conditions:
-            if all(self.board[row][col] == symbol for row, col in condition):
+            if all(board[row][col] == symbol for row, col in condition):
                 return True
         return False
 
