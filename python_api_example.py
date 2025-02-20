@@ -9,20 +9,25 @@ import asyncio
 def clear():
     os.system('cls' if os.name == 'nt' else 'clear')
 
-async def ask(messages, prompt):
-    clear()
-    for message in messages: print(message)
-    return input(prompt)
-
 async def main():
-    # Game instance
+    async def ask(messages, prompt):
+        clear()
+        
+        for message in messages: print(message)
+
+        if len(game.moves) >= 2:
+            last_score = game.moves[len(game.moves) - 2]["score"]
+            print(f"[DEBUG] last score: {last_score}")
+        
+        return input(prompt)
+    
     game = TwoPlayerGame(TicTacToe, ask)
 
     # runs the game
-    await game.make_turns(amount_of_turns=1)
+    # await game.make_turns(amount_of_turns=1)
 
     # runs random moves for the amount_of_turns 
-    await game.random_moves(amount_of_turns=3)
+    # await game.random_moves(amount_of_turns=3)
 
     # runs the game until finish
     await game.make_turns_until_finish()
