@@ -129,3 +129,7 @@ class Game:
     @property
     def finished(self):
         return self._game_instance.game_over
+    
+    @property
+    def invalid_attempts(self):
+        return self._total_invalid_attempts[0]
