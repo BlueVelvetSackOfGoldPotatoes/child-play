@@ -1,6 +1,6 @@
 from main import TextPlayer, RandomPlayer, DynamicPlayer
 
-class Game:
+class TwoPlayerGame:
     def __init__(self, SpecificGameClass, ask, max_invalid_attempts=2):
         def generateInternalAsk(name):
             async def internalAsk(prompt):        
