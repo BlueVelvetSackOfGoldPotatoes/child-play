@@ -107,16 +107,16 @@ class ConnectFour:
         for line in directions:
             symbols = [new_board[r][c] for r, c in line]
             if symbols.count(opponent_symbol) == 3 and symbols.count(".") == 0:
-                score += 0.8  # Blocking opponent's winning move
+                score = max(score, 0.8)  # Blocking opponent's winning move
             elif symbols.count(opponent_symbol) == 2 and symbols.count(".") == 0:
-                score += 0.7  # Blocking opponent's 2 in a row
+                score = max(score, 0.7)  # Blocking opponent's 2 in a row
                 
             if symbols.count(symbol) == 3 and symbols.count(".") >= 1:
-                score += 0.7  # Creating three in a row
+                score = max(score, 0.7)  # Creating three in a row
             elif symbols.count(symbol) == 2 and symbols.count(".") >= 2:
-                score += 0.6  # Creating unblocked two in a row
+                score = max(score, 0.6)  # Creating unblocked two in a row
             elif symbols.count(symbol) == 2 and symbols.count(".") >= 1:
-                score += 0.3  # Creating two in a row
+                score = max(score, 0.3)  # Creating two in a row
         
         if score > 0.9:
             score = 0.9
