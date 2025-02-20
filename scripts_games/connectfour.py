@@ -1,3 +1,5 @@
+import copy
+
 class ConnectFour:
     def __init__(self, options=None):
         if options is None:
@@ -28,17 +30,22 @@ class ConnectFour:
     def check_tie(self):
         return all(self.board[0][col] != '.' for col in range(self.cols)) and not self.check_win()
 
-    def check_win(self):
-        row, col = self.last_move
+    def check_win(self, new_board = None, last_move = None):
+        if new_board is None:
+            new_board = self.board
+        if last_move is None:
+            last_move = self.last_move
+        
+        row, col = last_move
         if row == -1:
             return False
-        player = self.board[row][col]
+        player = new_board[row][col]
         directions = [(0, 1), (1, 0), (1, 1), (1, -1)]
         for dr, dc in directions:
             count = 1
             for d in [1, -1]:
                 r, c = row, col
-                while 0 <= r + d*dr < self.rows and 0 <= c + d*dc < self.cols and self.board[r + d*dr][c + d*dc] == player:
+                while 0 <= r + d*dr < self.rows and 0 <= c + d*dc < self.cols and new_board[r + d*dr][c + d*dc] == player:
                     count += 1
                     r += d*dr
                     c += d*dc
@@ -55,18 +62,68 @@ class ConnectFour:
             return False
         for row in reversed(range(self.rows)):
             if self.board[row][col] == ".":
+
+                previous_board = copy.deepcopy(self.board)
                 self.board[row][col] = "X" if player_index == 0 else "O"
                 self.last_move = (row, col)
+                
                 if self.check_win():
                     self.game_over = True
-                    return "Win", True
+                    return "Win", True, 1.0
                 if self.check_tie():
                     self.game_over = True
-                    return "Tie", True
+                    return "Tie", True, 0.5
                 
                 self.switch_player()
-                return "Valid move", True
-        return "Invalid move.", False
+                score = self.calculate_score(previous_board, (row, col), player_index)
+                return "Valid move", True, score
+        return "Invalid move.", False, None
+    
+    def calculate_score(self, previous_board, guess, player_index):
+        """Calculates the score of a move in Connect 4 based on its impact."""
+        import copy
+        
+        row, col = guess
+        symbol = "X" if player_index == 0 else "O"
+        opponent_symbol = "O" if symbol == "X" else "X"
+        score = 0.0
+        
+        # Clone the previous board
+        new_board = copy.deepcopy(previous_board)
+        
+        new_board[row][col] = symbol  # Apply the move
+        
+        # Check if the move results in a win
+        if self.check_win(new_board, (row, col)):
+            return 1.0
+        
+        directions = [
+            [(row + i, col) for i in range(-3, 4) if 0 <= row + i < self.rows],  # Vertical
+            [(row, col + i) for i in range(-3, 4) if 0 <= col + i < self.cols],  # Horizontal
+            [(row + i, col + i) for i in range(-3, 4) if 0 <= row + i < self.rows and 0 <= col + i < self.cols],  # Diagonal \
+            [(row + i, col - i) for i in range(-3, 4) if 0 <= row + i < self.rows and 0 <= col - i < self.cols]  # Diagonal /
+        ]
+        
+        for line in directions:
+            symbols = [new_board[r][c] for r, c in line]
+            if symbols.count(opponent_symbol) == 3 and symbols.count(symbol) == 1:
+                score += 0.8  # Blocking opponent's winning move
+            elif symbols.count(opponent_symbol) == 2 and symbols.count(symbol) == 1:
+                score += 0.7  # Blocking opponent's 2 in a row
+                
+            if symbols.count(symbol) == 3 and symbols.count(".") == 1:
+                score += 0.9  # Creating unblocked three in a row
+            elif symbols.count(symbol) == 3:
+                score += 0.7  # Creating three in a row
+            elif symbols.count(symbol) == 2 and symbols.count(".") == 2:
+                score += 0.6  # Creating unblocked two in a row
+            elif symbols.count(symbol) == 2 and symbols.count(".") == 2:
+                score += 0.3  # Creating two in a row
+        
+        if score > 0.9:
+            score = 0.9
+        
+        return score
     
     def get_text_state(self, player_index=None):
         red = "\033[91mX\033[0m"
