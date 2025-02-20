@@ -12,7 +12,7 @@ class Game:
                 messages.append(f"Turn {self.turn}")
                 messages.append(f"{player.name}'s turn to guess.")
         
-                return self.ask(messages, prompt)
+                return await self.ask(messages, prompt)
             
             return internalAsk
         
@@ -68,6 +68,14 @@ class Game:
         if self.random_turns_left > 0:
             self.random_turns_left = 0
             raise Exception("Not all random moves have been played")
+        
+    async def random_move(self):
+        return await self.random_moves(1)
+    
+    async def make_turns_until_finish(self):
+        # todo: use self.finished
+        while not self._game_instance.game_over:
+            await self.random_move()
     
     async def make_turns(self, amount_of_turns=1):
         for i in range(amount_of_turns):
