@@ -1,3 +1,0 @@
-from scripts_games.battleship import BattleShip
-from scripts_games.connectfour import ConnectFour
-from scripts_games.tictactoe import TicTacToe

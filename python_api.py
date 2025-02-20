@@ -1,7 +1,7 @@
-from main import play_one_game, TextPlayer, RandomPlayer, DynamicPlayer
+from main import TextPlayer, RandomPlayer, DynamicPlayer
 
 class Game:
-    def __init__(self, SpecificGameClass, ask):
+    def __init__(self, SpecificGameClass, ask, max_invalid_attempts=2):
         def generateInternalAsk(name):
             async def internalAsk(prompt):        
                 player = self._player1 if name == "P1" else self._player2
@@ -9,9 +9,10 @@ class Game:
                 messages = []
                 messages.append(self._game_instance.prompt)
                 messages.append(self._game_instance.get_text_state(player.player_id))
+                messages.append(f"Turn {self.turn}")
                 messages.append(f"{player.name}'s turn to guess.")
         
-                pass
+                return self.ask(messages, prompt)
             
             return internalAsk
         
@@ -31,9 +32,10 @@ class Game:
 
             return choosePlayer
         
-        self.random_turns_left = 0
-        
         self.ask = ask
+        self.max_invalid_attempts = max_invalid_attempts
+        
+        self.random_turns_left = 0
         
         self._game_instance = SpecificGameClass()
 
@@ -45,8 +47,6 @@ class Game:
         
         self._player1 = DynamicPlayer(0, generateChoosePlayer("P1"), "P1")
         self._player2 = DynamicPlayer(1, generateChoosePlayer("P2"), "P2")
-
-        self.max_invalid_attempts = 2 # todo: make customizable
 
         self._game_instance.reset_board()
         

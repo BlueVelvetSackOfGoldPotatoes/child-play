@@ -1,5 +1,5 @@
-from .main import Game
-from .two_player_games import TicTacToe
+from python_api import Game
+from scripts_games.tictactoe import TicTacToe
 
 import os
 import asyncio
