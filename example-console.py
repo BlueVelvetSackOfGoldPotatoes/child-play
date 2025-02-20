@@ -10,7 +10,7 @@ def clear():
     os.system('cls' if os.name == 'nt' else 'clear')
 
 def ask(name):
-    def inner(prompt):
+    async def inner(prompt):
         player = player1 if name == "P1" else player2
 
         messages = []
