@@ -58,7 +58,7 @@ class LLMPlayer(PlayerBase):
             print("-" * 60)
         print("=" * 50)
 
-    async def make_guess(self, game, previous_play):
+    async def make_guess(self, game, previous_play, extra_message=[]):
         api_messages = [{"role": "system", "content": f"You are a player in a game of {self.game.name}. {self.game.prompt}."}]
         current_state = game.get_text_state(None)
         prompt = f"Player {self.player_id + 1} ({self.player_name}), it's your turn. Here's the current game state:\n{current_state}\nMy move is: "
@@ -110,10 +110,12 @@ class TextPlayer(PlayerBase):
         super().__init__(player_id, name, debug)
         self.callback = callback
 
-    async def make_guess(self, game, previous_play=""):
+    async def make_guess(self, game, previous_play="", extra_messages=[]):
+        print(1, extra_messages)
+        
         while True:  # This loop is for interactive attempts, not for re-tries in `play_one_game`
             instruction = f"\nEnter your move: "
-            text_guess = await self.callback(instruction)  # This calls console_callback for input
+            text_guess = await self.callback(instruction, extra_messages)  # This calls console_callback for input
 
             try:
                 # Attempt to parse the input according to the expected format
@@ -143,15 +145,15 @@ class DynamicPlayer(PlayerBase):
         super().__init__(player_id, name, debug)
         self.callback = callback
 
-    async def make_guess(self, game, previous_play=""):
+    async def make_guess(self, game, previous_play="", extra_messages=[]):
         player = self.callback()
-        return await player.make_guess(game, previous_play)
+        return await player.make_guess(game, previous_play, extra_messages=extra_messages)
 
 class RandomPlayer(PlayerBase):
     def __init__(self, player_id, name, debug=False):
         super().__init__(player_id, name, debug)
 
-    async def make_guess(self, game, previous_play=""):
+    async def make_guess(self, game, previous_play="", extra_message=[]):
         if game.name == "shapes":
             guess = random.randint(0, 3)
             print(f"[RandomPlayer] Chose shape index: {guess}")

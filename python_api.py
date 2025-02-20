@@ -4,7 +4,7 @@ from main import TextPlayer, RandomPlayer, DynamicPlayer
 class TwoPlayerGame:
     def __init__(self, SpecificGameClass, ask, max_invalid_attempts=2):
         def generateInternalAsk(name):
-            async def internalAsk(prompt):
+            async def internalAsk(prompt, extra_messages=[]):
                 player = self._player1 if name == "P1" else self._player2
 
                 messages = []
@@ -14,6 +14,9 @@ class TwoPlayerGame:
                     f"Turn {self.turn + 1}"
                 )  # +1 because turn is counted from 0
                 messages.append(f"{player.name}'s turn to guess.")
+
+                for message in extra_messages:
+                    messages.append(message)
 
                 return await self.ask(messages, prompt)
 
@@ -96,6 +99,9 @@ class TwoPlayerGame:
                 break
 
     async def make_turn(self, extra_messages=[]):
+        if self.finished:
+            return
+
         current_player = self._players[self._current_player_index]
         is_random_player = self.random_turns_left > 0
 
@@ -124,7 +130,7 @@ class TwoPlayerGame:
             return await self.make_turn([*extra_messages, message])
 
         guess = await current_player.make_guess(
-            self._game_instance, previous_play=None
+            self._game_instance, previous_play=None, extra_messages=extra_messages
         )  # previous_play is not used
 
         if guess is None:
