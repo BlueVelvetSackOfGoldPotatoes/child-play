@@ -60,8 +60,7 @@ class Game:
         self.random_turns_left = amount_of_turns
         await self.make_turns(amount_of_turns)
         
-        # todo: use game.finished
-        if self._game_instance.game_over:
+        if self.finished:
             self.random_turns_left = 0
             return
         
@@ -73,16 +72,14 @@ class Game:
         return await self.random_moves(1)
     
     async def make_turns_until_finish(self):
-        # todo: use self.finished
-        while not self._game_instance.game_over:
+        while not self.finished:
             await self.random_move()
     
     async def make_turns(self, amount_of_turns=1):
         for i in range(amount_of_turns):
             await self.make_turn()
 
-            # todo: use game.finished  
-            if self._game_instance.game_over:
+            if self.finished:
                 break
     
     async def make_turn(self, extra_messages=[]):
@@ -126,6 +123,9 @@ class Game:
         self._current_player_index = 0 if self._current_player_index == 1 else 1
     
     async def make_turns_until_finish(self):
-        # todo: use self.finished
-        while not self._game_instance.game_over:
+        while not self.finished:
             await self.make_turn()
+    
+    @property
+    def finished(self):
+        return self._game_instance.game_over
