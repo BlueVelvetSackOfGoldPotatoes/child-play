@@ -117,7 +117,7 @@ class TwoPlayerGame:
         if guess is None:
             return await handle_invalid_move("Invalid guess")
 
-        message, valid_move = self._game_instance.guess(self._current_player_index, guess, current_player)
+        message, valid_move, score = self._game_instance.guess(self._current_player_index, guess, current_player)
         
         if not valid_move:
             return await handle_invalid_move(f"Guess: {guess}\n{message}")
@@ -151,12 +151,12 @@ class TwoPlayerGame:
             move_player_name = "custom"
         else:
             move_player_name = "opponent"
-            
+        
         self.moves.append({
             "player": move_player_name,
             "player_index": self._current_player_index,
-            "guess": guess
-            # todo: score the guess (also use win or loss)
+            "guess": guess,
+            "score": score
         })
         
         if self._game_instance.game_over:
