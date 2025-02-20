@@ -138,6 +138,15 @@ class TextPlayer(PlayerBase):
                 print("[TextPlayer] Invalid input format.")
                 return None  # Signaling `play_one_game` to handle this as an invalid move
 
+class DynamicPlayer(PlayerBase):
+    def __init__(self, player_id, callback, name, debug=False):
+        super().__init__(player_id, name, debug)
+        self.callback = callback
+
+    async def make_guess(self, game, previous_play=""):
+        player = self.callback()
+        return await player.make_guess(game, previous_play)
+
 class RandomPlayer(PlayerBase):
     def __init__(self, player_id, name, debug=False):
         super().__init__(player_id, name, debug)
