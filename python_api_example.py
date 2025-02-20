@@ -28,8 +28,7 @@ async def main():
 
     await game.random_moves(3)
 
-    if not game.finished:
-        await game.make_turns_until_finish()
+    await game.make_turns_until_finish()
 
     # game is finished
 
