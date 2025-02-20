@@ -56,6 +56,7 @@ class TwoPlayerGame:
         self._total_invalid_attempts = [0, 0]
         self._invalid_attempts = [0, 0]  # Track invalid attempts for both players
         self.turn = 0
+        self.moves = []
     
     async def random_moves(self, amount_of_turns=4):
         self.random_turns_left = amount_of_turns
@@ -125,7 +126,7 @@ class TwoPlayerGame:
             
         if message == "Win" or message == "Tie" or message == "Loss":
             self._game_instance.game_over = True
-            
+        
         if self._game_instance.game_over:
             if message == "Tie":
                 self.winner = "tie"
@@ -134,7 +135,6 @@ class TwoPlayerGame:
                     self.winner = "random"
                 elif self._current_player_index == 0:
                     self.winner = "custom"
-                    return
                 else:
                     self.winner = "opponent"
             elif message == "Loss":
@@ -144,7 +144,22 @@ class TwoPlayerGame:
                     self.winner = "custom"
             else:
                 raise Exception(f"Unknown game.guess return message: {message}")
+        
+        if is_random_player:
+            move_player_name = "random"
+        elif self._current_player_index == 0:
+            move_player_name = "custom"
+        else:
+            move_player_name = "opponent"
             
+        self.moves.append({
+            "player": move_player_name,
+            "player_index": self._current_player_index,
+            "guess": guess
+            # todo: score the guess (also use win or loss)
+        })
+        
+        if self._game_instance.game_over:
             return
         
         self.turn += 1
