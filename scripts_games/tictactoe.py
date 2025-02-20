@@ -86,9 +86,9 @@ class TicTacToe:
         for line in directions:
             symbols = [new_board[r][c] for r, c in line]
             if symbols.count(opponent_symbol) == 2 and symbols.count(" ") == 1:
-                score += 0.4  # Blocking opponent
+                score += 0.8  # Blocking opponent
             if symbols.count(symbol) == 2 and symbols.count(" ") == 1:
-                score += 0.3  # Creating two in a row
+                score += 0.6  # Creating two in a row
         
         if score > 0.9:
             score = 0.9
