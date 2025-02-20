@@ -58,7 +58,7 @@ class LLMPlayer(PlayerBase):
             print("-" * 60)
         print("=" * 50)
 
-    async def make_guess(self, game, previous_play, extra_message=[]):
+    async def make_guess(self, game, previous_play, extra_messages=[]):
         api_messages = [{"role": "system", "content": f"You are a player in a game of {self.game.name}. {self.game.prompt}."}]
         current_state = game.get_text_state(None)
         prompt = f"Player {self.player_id + 1} ({self.player_name}), it's your turn. Here's the current game state:\n{current_state}\nMy move is: "
@@ -153,7 +153,7 @@ class RandomPlayer(PlayerBase):
     def __init__(self, player_id, name, debug=False):
         super().__init__(player_id, name, debug)
 
-    async def make_guess(self, game, previous_play="", extra_message=[]):
+    async def make_guess(self, game, previous_play="", extra_messages=[]):
         if game.name == "shapes":
             guess = random.randint(0, 3)
             print(f"[RandomPlayer] Chose shape index: {guess}")
