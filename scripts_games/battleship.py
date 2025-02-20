@@ -131,16 +131,18 @@ class BattleShip:
         miss_marker = "O" if self.current_player == "P1" else "O"
 
         if target_board[row][col] == 'S':
+            score = 0.8
             guess_board[row][col] = hit_marker
             target_board[row][col] = hit_marker
             if self.check_win():
                 self.game_over = True
-                return "Win", True
+                return "Win", True, 1.0
         else:
+            score = 0.0
             guess_board[row][col] = miss_marker
             
         self.switch_player()
-        return "Valid move", True
+        return "Valid move", True, score
     
     def check_loss(self) -> bool:
         return False
