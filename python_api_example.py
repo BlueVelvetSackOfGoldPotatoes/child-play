@@ -25,7 +25,7 @@ async def main():
     # runs the game until finish
     await game.make_turns_until_finish()
     
-    print("moves", game.moves)
+    # print("moves", game.moves)
     # [
     #     {
     #         player: "custom", "opponent" or "random"
@@ -34,10 +34,10 @@ async def main():
     #     }
     # ]
     
-    print("winner", game.winner)
+    # print("winner", game.winner)
     # None (for tie), "custom", "opponent" or "random"
     
-    print("invalid moves", game.invalid_moves)
+    # print("invalid moves", game.invalid_moves)
     # number of invalid moves by custom player
     
     print("finished", game.finished)
