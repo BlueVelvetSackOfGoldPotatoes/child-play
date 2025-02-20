@@ -1,5 +1,7 @@
-from python_api import Game
+from python_api import TwoPlayerGame
 from scripts_games.tictactoe import TicTacToe
+from scripts_games.connectfour import ConnectFour
+from scripts_games.battleship import BattleShip
 
 import os
 import asyncio
@@ -14,16 +16,18 @@ async def ask(messages, prompt):
 
 async def main():
     # Game instance
-    game = Game(TicTacToe, ask)
+    game = TwoPlayerGame(ConnectFour, ask)
 
-    # runs random moves for the amount_of_turns 
-    await game.random_moves(amount_of_turns=2)
-    
     # runs the game
     await game.make_turns(amount_of_turns=1)
 
+    # runs random moves for the amount_of_turns 
+    await game.random_moves(amount_of_turns=3)
+
     # runs the game until finish
     await game.make_turns_until_finish()
+    
+    clear()
     
     # print("moves", game.moves)
     # [
@@ -34,11 +38,11 @@ async def main():
     #     }
     # ]
     
-    # print("winner", game.winner)
-    # None (for tie), "custom", "opponent" or "random"
+    print("winner", game.winner)
+    # None (if game not finished), "tie", "custom", "opponent" or "random"
     
-    # print("invalid moves", game.invalid_moves)
-    # number of invalid moves by custom player
+    print("invalid attempts", game.invalid_attempts)
+    # number of invalid attempts by custom player
     
     print("finished", game.finished)
     # boolean if game is finished
