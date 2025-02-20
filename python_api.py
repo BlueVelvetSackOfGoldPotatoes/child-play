@@ -96,9 +96,6 @@ class TwoPlayerGame:
                 # End game if max invalid attempts are exceeded
                 self._game_instance.game_over = True
 
-                winning_message = f"{self._players[1 - self._current_player_index].name} wins by default due to {current_player.name}'s repeated invalid moves."
-                # todo: use winning_message
-
                 # other player wins
                 if self._current_player_index == 0:
                     self.winner = "opponent"
