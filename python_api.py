@@ -176,3 +176,7 @@ class TwoPlayerGame:
     @property
     def invalid_attempts(self):
         return self._total_invalid_attempts[0]
+    
+    @property
+    def text_state(self):
+        return self._game_instance.get_text_state(self._players[0].player_id)
