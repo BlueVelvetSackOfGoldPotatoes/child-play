@@ -30,25 +30,11 @@ async def main():
 
     await game.make_turns_until_finish()
 
-    # game is finished
-
     clear()
-
-    print("moves", game.moves)
-    # [
-    #     {
-    #         player: "custom", "opponent" or "random"
-    #         player_index: 0 or 1
-    #         guess: ... # differs per game
-    #         score: 0-1
-    #     }
-    # ]
-
+    print(game.moves)
     print(game.text_state)
-
-    print("winner", game.winner)
     # None (if game not finished), "tie", "custom", "opponent" or "random"
-
+    print("winner", game.winner)
     print("invalid attempts", game.invalid_attempts)
 
 
