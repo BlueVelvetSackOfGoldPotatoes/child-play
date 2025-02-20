@@ -16,7 +16,7 @@ async def ask(messages, prompt):
 
 async def main():
     # Game instance
-    game = TwoPlayerGame(ConnectFour, ask)
+    game = TwoPlayerGame(TicTacToe, ask)
 
     # runs the game
     await game.make_turns(amount_of_turns=1)
@@ -29,10 +29,11 @@ async def main():
     
     clear()
     
-    # print("moves", game.moves)
+    print("moves", game.moves)
     # [
     #     {
     #         player: "custom", "opponent" or "random"
+    #         player_index: 0 or 1
     #         guess: ... # differs per game
     #         score: 0-1
     #     }
