@@ -87,7 +87,7 @@ class TwoPlayerGame:
     async def random_move(self):
         return await self.random_moves(1)
 
-    async def make_turns_until_finish(self):
+    async def random_moves_until_finish(self):
         while not self.finished:
             await self.random_move()
 
