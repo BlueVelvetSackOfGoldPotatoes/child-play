@@ -1,9 +1,9 @@
-from main import play_one_game, TextPlayer
+from main import play_one_game, TextPlayer, RandomPlayer, DynamicPlayer
 
 class Game:
-    def __init__(self, SpecificGameClass):
-        def generateAsk(name):
-            async def ask(prompt):        
+    def __init__(self, SpecificGameClass, ask):
+        def generateInternalAsk(name):
+            async def internalAsk(prompt):        
                 player = self._player1 if name == "P1" else self._player2
 
                 messages = []
@@ -13,11 +13,38 @@ class Game:
         
                 pass
             
-            return ask
+            return internalAsk
+        
+        def generateChoosePlayer(name):
+            is_player1 = name == "P1"
+            
+            def choosePlayer():
+                # If there are still random turns left, we use randomPlayer, otherwise normal player
+                if self.random_turns_left > 0:
+                    self.random_turns_left -= 1
+                    
+                    if is_player1: return self._player1_random
+                    else: return self._player2_random
+                else:
+                    if is_player1: return self._player1_normal
+                    else: return self._player2_normal
+
+            return choosePlayer
+        
+        self.random_turns_left = 0
+        
+        self.ask = ask
         
         self._game_instance = SpecificGameClass()
-        self._player1 = TextPlayer(0, generateAsk("P1"), "P1")
-        self._player2 = TextPlayer(1, generateAsk("P2"), "P2")
+
+        self._player1_normal = TextPlayer(0, generateInternalAsk("P1"), "P1")
+        self._player2_normal = RandomPlayer(1, "P2")
+
+        self._player1_random = RandomPlayer(0, "P1")
+        self._player2_random = RandomPlayer(1, "P2")
+        
+        self._player1 = DynamicPlayer(0, generateChoosePlayer("P1"), "P1")
+        self._player2 = DynamicPlayer(1, generateChoosePlayer("P2"), "P2")
 
         self.max_invalid_attempts = 2 # todo: make customizable
 
@@ -27,14 +54,20 @@ class Game:
         self._current_player_index = 0 if self._game_instance.current_player == "P1" else 1
         self._total_invalid_attempts = [0, 0]
         self._invalid_attempts = [0, 0]  # Track invalid attempts for both players
-        self._wrong_moves = [0, 0] #todo: what is this? and make api for this # Track wrong moves (both invalid and incorrect) for both players
         self.turn = 0
     
-    async def random_moves(amount_of_turns=4):
-        pass
-    
-    async def random_move():
-        pass
+    async def random_moves(self, amount_of_turns=4):
+        self.random_turns_left = amount_of_turns
+        await self.make_turns(amount_of_turns)
+        
+        # todo: use game.finished
+        if self._game_instance.game_over:
+            self.random_turns_left = 0
+            return
+        
+        if self.random_turns_left > 0:
+            self.random_turns_left = 0
+            raise Exception("Not all random moves have been played")
     
     async def make_turns(self, amount_of_turns=1):
         for i in range(amount_of_turns):
@@ -50,7 +83,6 @@ class Game:
         async def handle_invalid_move(message=None):
             self._invalid_attempts[self._current_player_index] += 1
             self._total_invalid_attempts[self._current_player_index] += 1
-            self._wrong_moves[self._current_player_index] += 1
             
             if self._invalid_attempts[self._current_player_index] >= self.max_invalid_attempts:
                 # End game if max invalid attempts are exceeded
@@ -72,7 +104,6 @@ class Game:
             return await handle_invalid_move()
 
         message, valid_move = self._game_instance.guess(self._current_player_index, guess, current_player)
-        # todo: use message
         
         if not valid_move:
             return await handle_invalid_move(message)

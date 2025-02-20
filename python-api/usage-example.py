@@ -14,7 +14,7 @@ async def ask(messages, prompt):
 
 async def main():
     # Game instance
-    game = Game(TicTacToe)
+    game = Game(TicTacToe, ask)
 
     # runs random moves for the amount_of_turns 
     await game.random_moves(amount_of_turns=2)
