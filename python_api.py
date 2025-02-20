@@ -9,7 +9,7 @@ class TwoPlayerGame:
                 messages = []
                 messages.append(self._game_instance.prompt)
                 messages.append(self._game_instance.get_text_state(player.player_id))
-                messages.append(f"Turn {self.turn}")
+                messages.append(f"Turn {self.turn + 1}") # +1 because turn is counted from 0
                 messages.append(f"{player.name}'s turn to guess.")
         
                 return await self.ask(messages, prompt)
