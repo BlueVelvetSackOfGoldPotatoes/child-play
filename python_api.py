@@ -73,6 +73,9 @@ class TwoPlayerGame:
         self.moves = []
 
     async def random_moves(self, amount_of_turns=4):
+        if self.finished:
+            return
+
         self.random_turns_left = amount_of_turns
         await self.make_turns(amount_of_turns)
 
@@ -85,13 +88,22 @@ class TwoPlayerGame:
             raise Exception("Not all random moves have been played")
 
     async def random_move(self):
+        if self.finished:
+            return
+
         return await self.random_moves(1)
 
     async def random_moves_until_finish(self):
+        if self.finished:
+            return
+
         while not self.finished:
             await self.random_move()
 
     async def make_turns(self, amount_of_turns=1):
+        if self.finished:
+            return
+
         for i in range(amount_of_turns):
             await self.make_turn()
 
@@ -187,6 +199,9 @@ class TwoPlayerGame:
         self._current_player_index = 1 - self._current_player_index
 
     async def make_turns_until_finish(self):
+        if self.finished:
+            return
+
         while not self.finished:
             await self.make_turn()
 
