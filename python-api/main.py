@@ -44,31 +44,14 @@ class Game:
             if self._game_instance.game_over:
                 break
     
-    async def make_turn(self):
+    async def make_turn(self, extra_messages=[]):
         current_player = self._players[self._current_player_index]
 
-        guess = await current_player.make_guess(self._game_instance, previous_play=None) # previous_play is not used
-
-        if guess is None:
+        async def handle_invalid_move(message=None):
             self._invalid_attempts[self._current_player_index] += 1
             self._total_invalid_attempts[self._current_player_index] += 1
             self._wrong_moves[self._current_player_index] += 1
-            if self._invalid_attempts[self._current_player_index] >= self.max_invalid_attempts:
-                # End game if max invalid attempts are exceeded
-                self._game_instance.game_over = True
-                # todo: use winning_message
-                winning_message = f"{self._players[1 - self._current_player_index].name} wins by default due to {current_player.name}'s repeated invalid moves."
-                # todo: don't return
-                return
-
-        message, valid_move = self._game_instance.guess(self._current_player_index, guess, current_player)
-        # todo: use message
-        
-        if not valid_move:
-            # todo: combine with same code above
-            self._invalid_attempts[self._current_player_index] += 1
-            self._total_invalid_attempts[self._current_player_index] += 1
-            self._wrong_moves[self._current_player_index] += 1
+            
             if self._invalid_attempts[self._current_player_index] >= self.max_invalid_attempts:
                 # End game if max invalid attempts are exceeded
                 self._game_instance.game_over = True
@@ -77,9 +60,24 @@ class Game:
                 # todo: don't return
                 return
             
-            # todo: what to do now???
-        else:
-            self._invalid_attempts[self._current_player_index] = 0
+            # the player can still try again, because invalid attempts is less than max invalid attempts
+            if message is None:
+                message = "Invalid guess"
+            return await self.make_turn([*extra_messages, message])
+
+        # todo: use extra messages
+        guess = await current_player.make_guess(self._game_instance, previous_play=None) # previous_play is not used
+
+        if guess is None:
+            return await handle_invalid_move()
+
+        message, valid_move = self._game_instance.guess(self._current_player_index, guess, current_player)
+        # todo: use message
+        
+        if not valid_move:
+            return await handle_invalid_move(message)
+
+        self._invalid_attempts[self._current_player_index] = 0
             
         if self._game_instance.game_over:
             # todo
