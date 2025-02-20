@@ -36,6 +36,7 @@ class TwoPlayerGame:
         self.max_invalid_attempts = max_invalid_attempts
         
         self.random_turns_left = 0
+        self.winner = None # None (if game not finished), "tie", "custom", "opponent" or "random"
         
         self._game_instance = SpecificGameClass()
 
@@ -84,6 +85,7 @@ class TwoPlayerGame:
     
     async def make_turn(self, extra_messages=[]):
         current_player = self._players[self._current_player_index]
+        is_random_player = self.random_turns_left > 0
 
         async def handle_invalid_move(message=None):
             self._invalid_attempts[self._current_player_index] += 1
@@ -92,9 +94,16 @@ class TwoPlayerGame:
             if self._invalid_attempts[self._current_player_index] >= self.max_invalid_attempts:
                 # End game if max invalid attempts are exceeded
                 self._game_instance.game_over = True
-                # todo: use winning_message
+
                 winning_message = f"{self._players[1 - self._current_player_index].name} wins by default due to {current_player.name}'s repeated invalid moves."
-                # todo: don't return
+                # todo: use winning_message
+
+                # other player wins
+                if self._current_player_index == 0:
+                    self.winner = "opponent"
+                else:
+                    self.winner = "custom"
+
                 return
             
             # the player can still try again, because invalid attempts is less than max invalid attempts
@@ -102,25 +111,44 @@ class TwoPlayerGame:
                 message = "Invalid guess"
             return await self.make_turn([*extra_messages, message])
 
-        # todo: use extra messages
         guess = await current_player.make_guess(self._game_instance, previous_play=None) # previous_play is not used
 
         if guess is None:
-            return await handle_invalid_move()
+            return await handle_invalid_move("Invalid guess")
 
         message, valid_move = self._game_instance.guess(self._current_player_index, guess, current_player)
         
         if not valid_move:
-            return await handle_invalid_move(message)
+            return await handle_invalid_move(f"Guess: {guess}\n{message}")
 
         self._invalid_attempts[self._current_player_index] = 0
             
+        if message == "Win" or message == "Tie" or message == "Loss":
+            self._game_instance.game_over = True
+            
         if self._game_instance.game_over:
-            # todo
+            if message == "Tie":
+                self.winner = "tie"
+            elif message == "Win":
+                if is_random_player:
+                    self.winner = "random"
+                elif self._current_player_index == 0:
+                    self.winner = "custom"
+                    return
+                else:
+                    self.winner = "opponent"
+            elif message == "Loss":
+                if self._current_player_index == 0:
+                    self.winner = "opponent"
+                else:
+                    self.winner = "custom"
+            else:
+                raise Exception(f"Unknown game.guess return message: {message}")
+            
             return
         
         self.turn += 1
-        self._current_player_index = 0 if self._current_player_index == 1 else 1
+        self._current_player_index = 1- self._current_player_index
     
     async def make_turns_until_finish(self):
         while not self.finished:
