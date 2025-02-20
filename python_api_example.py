@@ -17,11 +17,11 @@ async def main():
 
         if len(game.moves) >= 2:
             last_score = game.moves[len(game.moves) - 2]["score"]
-            print(f"[DEBUG] last score: {last_score}")
+            print(f"last score: {last_score}")
         
         return input(prompt)
     
-    game = TwoPlayerGame(TicTacToe, ask)
+    game = TwoPlayerGame(ConnectFour, ask)
 
     # runs the game
     # await game.make_turns(amount_of_turns=1)
@@ -49,9 +49,6 @@ async def main():
     
     print("invalid attempts", game.invalid_attempts)
     # number of invalid attempts by custom player
-    
-    print("finished", game.finished)
-    # boolean if game is finished
     
 if __name__ == "__main__":
     asyncio.run(main())
