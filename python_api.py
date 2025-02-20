@@ -125,8 +125,6 @@ class TwoPlayerGame:
                 return
 
             # the player can still try again, because invalid attempts is less than max invalid attempts
-            if message is None:
-                message = "Invalid guess"
             return await self.make_turn([*extra_messages, message])
 
         guess = await current_player.make_guess(
