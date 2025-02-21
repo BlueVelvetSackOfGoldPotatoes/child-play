@@ -1,6 +1,6 @@
 import random
 
-class CountingShapesGame:
+class CountingShapes:
     def __init__(self, rows=10, cols=10):
         self.rows = rows
         self.cols = cols
@@ -56,7 +56,7 @@ class CountingShapesGame:
 
 # Example usage:
 if __name__ == "__main__":
-    game = CountingShapesGame()
+    game = CountingShapes()
     game.place_shapes('O', 'R', 5)
     print(game.place_shapes('O', 'R', 5))
     game.print_board()
