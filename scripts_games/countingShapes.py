@@ -55,7 +55,8 @@ class CountingShapesGame:
             print(" ".join(row))
 
 # Example usage:
-game = CountingShapesGame()
-game.place_shapes('O', 'R', 5)
-print(game.place_shapes('O', 'R', 5))
-game.print_board()
+if __name__ == "__main__":
+    game = CountingShapesGame()
+    game.place_shapes('O', 'R', 5)
+    print(game.place_shapes('O', 'R', 5))
+    game.print_board()
