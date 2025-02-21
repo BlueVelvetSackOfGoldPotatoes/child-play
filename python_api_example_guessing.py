@@ -1,10 +1,16 @@
-from python_api import GuessingGame
+from python_api import GuessingGame, LCLValidity
 from scripts_games.shapes import Shapes
 from scripts_games.countingShapes import CountingShapes
 
-def main():
-    game = GuessingGame(CountingShapes)
+import os
 
+def clear():
+    os.system("cls" if os.name == "nt" else "clear")
+
+def main():
+    game = GuessingGame(LCLValidity)
+
+    clear()
     for message in game.messages:
         print(message)
     print(game.text_state)
