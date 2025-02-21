@@ -1,4 +1,5 @@
 from main import TextPlayer, RandomPlayer, DynamicPlayer
+from lcl import LCLGame
 import random
 
 class TwoPlayerGame:
@@ -223,6 +224,8 @@ class GuessingGame:
             self._game = "shapes"
         elif GameClass.__name__ == "CountingShapes":
             self._game = "countingShapes"
+        elif GameClass.__name__ == "LCLValidity":
+            self._game = "lclValidity"
         else:
             self._game = "general"
         
@@ -285,6 +288,16 @@ class GuessingGame:
                 message = "Invalid guess. Guess is not an integer."
                 
                 return valid, correct, score, message
+        elif self._game == "lclValidity":
+            if guess == "valid" or guess == "invalid":
+                guess = guess == "valid"
+            else:
+                valid = False
+                correct = False
+                score = 0.0
+                message = "Invalid guess. Guess is not valid or invalid."
+                
+                return valid, correct, score, message
         
         if self._game == "countingShapes":
             # guess is always valid if it's an integer
@@ -294,6 +307,12 @@ class GuessingGame:
             message = None
             if not correct:
                 message = self._game_instance.compare_count(guess)
+        elif self._game == "lclValidity":
+            # guess is always valid if it's a boolean
+            valid = True
+            
+            message = None
+            correct = self._game_instance.guess(guess)
         else:
             message, valid = self._game_instance.guess(guess)
 
@@ -319,3 +338,28 @@ class GuessingGame:
             score = 0.0
         
         return valid, correct, score, message
+
+class LCLValidity:
+    def __init__(self):
+        self._game_instance = LCLGame()
+        self.reset()
+
+        self.prompt = (
+            f"You will receive a description of a Lego structure, for instance, [(x1, y1, 'color1'), "
+            f"(x2, y2, 'color2')], which lists the coordinates and colors of two pieces. A construct is "
+            f"valid if all Lego pieces are connected but not overlapping. A Lego piece is connected through "
+            f"interlocking pegs, not by merely touching sides. Two Lego pieces overlap when they share the "
+            f"same y-coordinate and any part of their length has the same x-coordinate. If the following "
+            f"structure is valid then reply with valid, otherwise reply with invalid (do not justify your "
+            f"answer)"
+        )
+
+    def reset(self):
+        self.answer = random.choice([True, False]) # Whether it's a valid move
+        self._pieces = self._game_instance.generate_valid_or_invalid_construct(5, valid=self.answer)
+
+    def get_text_state(self):
+        return f"{self._pieces}"
+
+    def guess(self, guess):
+        return guess == self.answer
