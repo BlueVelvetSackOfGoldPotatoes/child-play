@@ -223,13 +223,32 @@ class GuessingGame:
         
         if GameClass.__name__ == "Shapes":
             self._game = "shapes"
+        elif GameClass.__name__ == "CountingShapes":
+            self._game = "countingShapes"
         else:
             self._game = "general"
         
-        # Game instance
+        # Game instance and answer
         if self._game == "shapes":
             self.answer = random.choice(GameClass.possible_shapes)
             self._game_instance = GameClass(shape=self.answer)
+        elif self._game == "countingShapes":
+            self._game_instance = GameClass()
+            
+            # todo: randomize total_shapes_amount between numbers
+            total_shapes_amount = 6
+            possible_shape_symbols = list(GameClass.possible_shapes.values())
+            possible_color_symbols = list(GameClass.possible_colors.values())
+
+            shapes = [
+                (random.choice(possible_shape_symbols), random.choice(possible_color_symbols))
+                for _ in range(total_shapes_amount)
+            ]
+            
+            for shape in shapes:
+                self._game_instance.place_shapes(shape[0], shape[1], 1)
+        
+            self.answer = self._game_instance.count_shapes()
         else:
             self._game_instance = GameClass()
             self.answer = self._game_instance.answer
@@ -248,6 +267,8 @@ class GuessingGame:
         # Text state
         if self._game == "shapes":
             self.text_state = "\n".join("".join(row) for row in self._game_instance.board)
+        elif self._game == "countingShapes":
+            self.text_state = "\n".join(" ".join(row) for row in self._game_instance.board)
         else:
             self.text_state = self._game_instance.get_text_state()
         
@@ -256,7 +277,7 @@ class GuessingGame:
 
     def guess(self, guess):
         # Parse guess
-        if self._game == "shapes":
+        if self._game == "shapes" or self._game == "countingShapes":
             try:
                 guess = int(guess)
             except ValueError:
@@ -267,18 +288,27 @@ class GuessingGame:
                 
                 return valid, correct, score, message
         
-        message, valid = self._game_instance.guess(guess)
+        if self._game == "countingShapes":
+            # guess is always valid if it's an integer
+            valid = True
+            correct = guess == self.answer
 
-        if valid:
-            if message == "Win":
-                correct = True
+            message = None
+            if not correct:
+                message = self._game_instance.compare_count(guess)
+        else:
+            message, valid = self._game_instance.guess(guess)
+
+            if valid:
+                if message == "Win":
+                    correct = True
+                else:
+                    correct = False
             else:
                 correct = False
-        else:
-            correct = False
 
-        if valid:
-            message = None
+            if valid:
+                message = None
 
         if not valid:
             score = 0.0

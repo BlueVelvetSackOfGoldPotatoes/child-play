@@ -1,6 +1,18 @@
 import random
 
 class CountingShapes:
+    possible_shapes = {
+        "circle": "O",
+        "square": "[]",
+        "triangle": "Δ"
+    }
+    
+    possible_colors = {
+        "red": "R",
+        "green": "G",
+        "blue": "B"
+    }
+    
     def __init__(self, rows=10, cols=10):
         self.rows = rows
         self.cols = cols
@@ -8,6 +20,9 @@ class CountingShapes:
         self.shapes_count = {"R-O": 0, "G-O": 0, "B-O": 0,  # Circles
                              "R-[]": 0, "G-[]": 0, "B-[]": 0,  # Squares
                              "R-Δ": 0, "G-Δ": 0, "B-Δ": 0}  # Triangles
+
+        # todo
+        self.prompt = "PROMPT TODO"
 
     def reset_board(self):
         self.board = [[" " for _ in range(self.cols)] for _ in range(self.rows)]
