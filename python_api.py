@@ -1,6 +1,9 @@
 from main import TextPlayer, RandomPlayer, DynamicPlayer
 from lcl import LCLGame
+
 import random
+import re
+import ast
 
 class TwoPlayerGame:
     def __init__(self, SpecificGameClass, ask, max_invalid_attempts=2):
@@ -226,6 +229,8 @@ class GuessingGame:
             self._game = "countingShapes"
         elif GameClass.__name__ == "LCLValidity":
             self._game = "lclValidity"
+        elif GameClass.__name__ == "LCLGenerateConstruct":
+            self._game = "lclGenerateConstruct"
         else:
             self._game = "general"
         
@@ -250,6 +255,9 @@ class GuessingGame:
         
             # could be different then total_shapes_amount, because of overlapping shapes, or the game could stop placing new shapes, because board is full
             self.answer = self._game_instance.count_shapes()
+        elif self._game == "lclGenerateConstruct":
+            self._game_instance = GameClass()
+            self.answer = None # lclGenerateConstruct doesn't have one correct answer
         else:
             self._game_instance = GameClass()
             self.answer = self._game_instance.answer
@@ -270,6 +278,8 @@ class GuessingGame:
             self.text_state = "\n".join("".join(row) for row in self._game_instance.board)
         elif self._game == "countingShapes":
             self.text_state = "\n".join(" ".join(row) for row in self._game_instance.board)
+        elif self._game == "lclGenerateConstruct":
+            self.text_state = None # lclGenerateConstruct doesn't have a text state
         else:
             self.text_state = self._game_instance.get_text_state()
         
@@ -298,6 +308,9 @@ class GuessingGame:
                 message = "Invalid guess. Guess is not valid or invalid."
                 
                 return valid, correct, score, message
+        
+        if self._game == "lclGenerateConstruct":
+            return self._game_instance.guess(guess)
         
         if self._game == "countingShapes":
             # guess is always valid if it's an integer
@@ -367,3 +380,70 @@ class LCLValidity:
 
     def guess(self, guess):
         return guess == self.answer
+
+class LCLGenerateConstruct:
+    def __init__(self):
+        self._game_instance = LCLGame()
+        self.pieces_amount = 3
+
+        self.prompt = (
+            f"A description of a Lego structure consists of a list of tuples, "
+            f"[(x1, y1, 'color1'), (x2, y2, 'color2')], where each tuple shows the coordinates "
+            f"and colors of a piece. Such a structure is valid if all Lego pieces are connected "
+            f"but not overlapping. A Lego piece is connected through interlocking pegs, not by "
+            f"merely touching sides. Two Lego pieces overlap when they share the same y-coordinate "
+            f"and any part of their length has the same x-coordinate. Produce a description of a valid "
+            f"structure using {self.pieces_amount} Lego pieces. Reply only with the Lego structure description "
+            f"following the format [(x1, y1, 'color1'), (x2, y2, 'color2'), ...], write nothing else "
+            f"but the structure."
+        )
+
+    def guess(self, guess):
+        if isinstance(guess, str):
+            match = re.search(r'\[\s*(.*?)\s*\]', guess, re.DOTALL)
+
+            if not match:
+                valid = False
+                correct = False
+                score = 0.0
+                message = "Guess is not in the correct type"
+                return valid, correct, score, message
+
+            # Use the captured group from the match, which is the content inside the brackets
+            content_to_evaluate = match.group(0)  # Include the brackets
+
+            # Evaluate the extracted string content
+            evaluated_response = ast.literal_eval(content_to_evaluate)
+
+            # Check if evaluated_response is empty
+            if not evaluated_response:
+                valid = False
+                correct= False
+                score = 0.0
+                message = "Guess is an empty list"
+                return valid, correct, score, message
+
+            # Flatten if necessary
+            if len(evaluated_response) == 1 and isinstance(evaluated_response[0], tuple) and all(isinstance(item, tuple) for item in evaluated_response[0]):
+                # It's a list with one element, which is a tuple of tuples
+                evaluated_response = list(evaluated_response[0])
+
+            guess = evaluated_response
+            
+        valid = True
+        message = None
+        correct = self._game_instance.is_valid_construct(guess)
+        
+        if correct:
+            if len(guess) != self.pieces_amount:
+                correct = False
+                score = 0.5
+                message = "Guess does not have the correct amount of pieces"
+                
+                return valid, correct, score, message
+            
+            score = 1.0
+        else:
+            score = 0.0
+
+        return valid, correct, score, message
