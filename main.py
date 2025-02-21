@@ -109,10 +109,9 @@ class TextPlayer(PlayerBase):
     def __init__(self, player_id, callback, name, debug=False):
         super().__init__(player_id, name, debug)
         self.callback = callback
+        self.debug = debug
 
     async def make_guess(self, game, previous_play="", extra_messages=[]):
-        print(1, extra_messages)
-        
         while True:  # This loop is for interactive attempts, not for re-tries in `play_one_game`
             instruction = f"\nEnter your move: "
             text_guess = await self.callback(instruction, extra_messages)  # This calls console_callback for input
@@ -121,7 +120,7 @@ class TextPlayer(PlayerBase):
                 # Attempt to parse the input according to the expected format
                 if game.name == "shapes":
                     guess = int(text_guess)
-                    print(f"Player chose:{guess}")
+                    if self.debug: print(f"Player chose:{guess}")
                     return guess
                 elif game.name in ["connectfour"]:
                     col = int(text_guess)
@@ -137,7 +136,7 @@ class TextPlayer(PlayerBase):
             except (ValueError, IndexError):
                 # If input parsing fails or doesn't meet the criteria, inform the player and allow another attempt
                 self.collect_message("Invalid input. Please enter the column number for ConnectFour or row and column numbers separated by a space for other games.")
-                print("[TextPlayer] Invalid input format.")
+                if self.debug: print("[TextPlayer] Invalid input format.")
                 return None  # Signaling `play_one_game` to handle this as an invalid move
 
 class DynamicPlayer(PlayerBase):
@@ -152,41 +151,42 @@ class DynamicPlayer(PlayerBase):
 class RandomPlayer(PlayerBase):
     def __init__(self, player_id, name, debug=False):
         super().__init__(player_id, name, debug)
+        self.debug = debug
 
     async def make_guess(self, game, previous_play="", extra_messages=[]):
         if game.name == "shapes":
             guess = random.randint(0, 3)
-            print(f"[RandomPlayer] Chose shape index: {guess}")
+            if self.debug: print(f"[RandomPlayer] Chose shape index: {guess}")
             return guess
         elif game.name == "connectfour":
             # For ConnectFour, find columns that are not full
             available_cols = [col for col in range(game.cols) if game.board[0][col] == '.']
             if available_cols:
                 chosen_col = random.choice(available_cols)
-                print(f"[RandomPlayer] Chose column: {chosen_col}")
+                if self.debug: print(f"[RandomPlayer] Chose column: {chosen_col}")
                 return chosen_col
             else:
-                print("[RandomPlayer] No available columns to choose.")
+                if self.debug: print("[RandomPlayer] No available columns to choose.")
                 return None
         elif game.name == "tictactoe":
             # For TicTacToe, find empty positions on the board
             available_moves = [(row, col) for row in range(game.board_size) for col in range(game.board_size) if game.board[row][col] == " "]
             if available_moves:
                 chosen_move = random.choice(available_moves)
-                print(f"[RandomPlayer] Chose move: {chosen_move}")
+                if self.debug: print(f"[RandomPlayer] Chose move: {chosen_move}")
                 return chosen_move
             else:
-                print("[RandomPlayer] No available moves to choose.")
+                if self.debug: print("[RandomPlayer] No available moves to choose.")
                 return None
         elif game.name == "battleship":
             guess_board = game.guess_board_p1 if self.player_id == 0 else game.guess_board_p2
             available_moves = [(row, col) for row in range(game.board_size) for col in range(game.board_size) if guess_board[row][col] == "~"]
             if available_moves:
                 chosen_move = random.choice(available_moves)
-                print(f"[RandomPlayer] Chose Battleship guess: {chosen_move}")
+                if self.debug: print(f"[RandomPlayer] Chose Battleship guess: {chosen_move}")
                 return chosen_move
             else:
-                print("[RandomPlayer] No available Battleship moves to choose.")
+                if self.debug: print("[RandomPlayer] No available Battleship moves to choose.")
                 return None
 
 async def run_game_series(game_instance, player1, player2, num_games, max_invalid_attempts, size, debug=False):
