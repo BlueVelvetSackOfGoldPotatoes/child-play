@@ -12,11 +12,17 @@
 
 # OpenAi imports
 # from utils.gpt_api import key_openai
-import openai
+import os
 from openai import OpenAI
+from dotenv import load_dotenv
+import logging
 
-openai.api_key = ""
-client = OpenAI(api_key=openai.api_key)
+logger = logging.getLogger(__name__)
+
+load_dotenv()
+
+openai_api_key = os.environ.get("OPENAI_API_KEY")
+client = OpenAI(api_key=openai_api_key)
 
 # Hugging face imports
 from transformers import pipeline
@@ -25,10 +31,10 @@ def ask(api_messages, temperature, model):
     origin = model.split(':')[0]
     specific_model = model.split(':')[1]
     
-    text_prompt = "\n\n".join([message["role"] + ":\n" + message["content"] for message in api_messages])
     
     # OpenAI
     if origin == "oa":
+        text_prompt = "\n\n".join([message["role"] + ":\n" + message["content"] for message in api_messages])
         completion = client.chat.completions.create(
             model=specific_model,
             messages=api_messages,
@@ -39,6 +45,7 @@ def ask(api_messages, temperature, model):
 
     # Hugging Face
     elif origin == "hf":
+        text_prompt = "\n\n".join([message["role"] + ":\n" + message["content"] for message in api_messages])
         pipe = pipeline("text-generation", model=specific_model)
         result = pipe(text_prompt)
         full_text = result[0]['generated_text']
@@ -46,6 +53,7 @@ def ask(api_messages, temperature, model):
         response = full_text[len(text_prompt):]
         
     elif origin == "ans":
+        text_prompt = "\n\n".join([message["role"] + ":\n" + message["content"] for message in api_messages])
         response = specific_model
     
     # Mistral

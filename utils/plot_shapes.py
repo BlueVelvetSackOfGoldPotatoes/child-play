@@ -1,89 +1,111 @@
 import os
 import json
+import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
 import seaborn as sns
-from matplotlib.ticker import MaxNLocator
+import matplotlib.pyplot as plt
 
-def load_results(path):
+def calculate_proportion_for_temp(model, shape, temp, base_path, group):
     """
-    Load results from results_shapes.json and aggregate wins and losses.
-
-    Args:
-        path (str): Directory path containing results_shapes.json files.
-
-    Returns:
-        dict: Dictionary with 'Wins' and 'Losses' counts.
+    Returns the fraction of correct answers (0..1) for a given model, shape, and temperature.
+    If the path doesn't exist or no file is found, returns 0.
     """
-    wins = 0
-    losses = 0
-    results_file = os.path.join(path, 'results_shapes.json')
-    if os.path.exists(results_file):
+    total = 25  # Each shape has 25 trials per temperature
+    correct = 0
+
+    # Path to shape folder
+    shape_path = os.path.join(
+        base_path,
+        model.replace(":", "_"),  # just in case
+        str(temp).replace(".", "_"),
+        shape
+    )
+    if not os.path.exists(shape_path):
+        return 0.0
+
+    results_file = os.path.join(shape_path, 'results.json')
+    if not os.path.exists(results_file):
+        return 0.0
+
+    try:
         with open(results_file, 'r') as f:
-            results = json.load(f)
-            wins += results.get('Wins', 0)
-            losses += results.get('Losses', 0)
-    return {'Wins': wins, 'Losses': losses}
+            log = json.load(f)
 
-def bar_plot_shapes(base_path, models, temperatures, shapes):
-    # Update global font size and weight
-    plt.rcParams.update({'font.size': 20, 'font.weight': 'bold'})
-    
+            if group == 'group1':
+                # group1 uses P1 Wins for correct, P2 Wins for incorrect
+                correct = log.get('P1 Wins', 0)
+            elif group == 'group2':
+                # group2 uses Wins for correct, Losses for incorrect
+                correct = log.get('Wins', 0)
+    except:
+        pass
+
+    if total > 0:
+        return correct / total
+    return 0.0
+
+def line_plot_shapes(base_path, models, temperatures, shapes, model_groups):
+    """
+    For each model and shape, pick the best temperature by correct proportion.
+    Then plot one line per shape on a single figure, x-axis = model, y-axis = proportion correct.
+    """
+    all_rows = []
+
     for model in models:
-        fig, axes = plt.subplots(2, 2, figsize=(14, 12), sharey=True)
-        # fig.suptitle(f'Wins and Losses by Shape for {model}', fontsize=24, fontweight='bold')
+        group = model_groups.get(model, 'group1')  # fallback to group1
+        for shape in shapes:
+            best_proportion = 0.0
+            for temp in temperatures:
+                prop = calculate_proportion_for_temp(model, shape, temp, base_path, group)
+                if prop > best_proportion:
+                    best_proportion = prop
 
-        axes = axes.flatten()
-        for idx, temp in enumerate(temperatures):
-            data = []
-            for shape in shapes:
-                path = os.path.join(base_path, model.replace(":", "_"), str(temp).replace(".", "_"), shape)
-                counts = load_results(path)
-                data.append({'Shape': shape, 'Count': counts['Wins'], 'Type': 'Wins'})
-                data.append({'Shape': shape, 'Count': counts['Losses'], 'Type': 'Losses'})
+            all_rows.append({
+                'Model': model,
+                'Shape': shape,
+                'Proportion': best_proportion
+            })
 
-            df = pd.DataFrame(data)
-            bar_plot = sns.barplot(
-                x='Shape', y='Count', hue='Type', data=df, ax=axes[idx],
-                palette=['green', 'red'], alpha=0.75, dodge=0.4
-            )
+    # Create a DataFrame for plotting
+    df = pd.DataFrame(all_rows)
 
-            # Annotate each bar at the bottom just above the x-axis
-            for p in bar_plot.patches:
-                height = p.get_height()
-                if height > 0:  # Only annotate non-zero bars
-                    bar_plot.annotate(
-                        f'{int(height)}',
-                        (p.get_x() + p.get_width() / 2., 0),
-                        ha='center', va='bottom',
-                        xytext=(0, 5), textcoords='offset points',
-                        color='black', fontweight='bold', fontsize=20
-                    )
+    # Now we do a line plot:
+    sns.set(style="whitegrid")
+    plt.figure(figsize=(8, 6))
+    plt.title("Best Temperature Performance per Shape", fontsize=16, fontweight='bold')
 
-            axes[idx].set_title(f'Temperature {temp}', fontweight='bold', fontsize=25)
-            axes[idx].yaxis.set_major_locator(MaxNLocator(integer=True))
-            axes[idx].set_ylim(0, df['Count'].max() + 10)  # Add some space for annotation
+    # x-axis: Model, y-axis: Proportion, color/hue: Shape
+    # marker='o' draws dots at each model
+    ax = sns.lineplot(
+        data=df,
+        x='Model', y='Proportion', hue='Shape', marker='o'
+    )
 
-            if idx == len(temperatures) - 1:
-                axes[idx].legend(title='Result', title_fontsize='13', loc='upper right')
-            else:
-                axes[idx].get_legend().remove()
-
-        plt.tight_layout(rect=[0, 0.03, 1, 0.95])
-        # Ensure the output directory exists
-        output_dir = os.path.join(base_path, model.replace(":", "_"))
-        os.makedirs(output_dir, exist_ok=True)
-        plt.savefig(os.path.join(output_dir, f'answers_summary_{model.replace(":", "_")}.pdf'))
-        plt.close()
+    # Y-axis from 0 to 1
+    ax.set_ylim(0, 1)
+    ax.set_xlabel("Model", fontsize=12, fontweight='bold')
+    ax.set_ylabel("Correct Proportion", fontsize=12, fontweight='bold')
+    plt.legend(title="Shape", loc='best')
+    plt.tight_layout()
+    plt.show()
 
 def main():
-    models = ['oa_gpt-4-1106-preview', 'oa_gpt-3.5-turbo-1106', 'oa:gpt-4o-2024-08-06', 'oa:gpt-4o-mini-2024-07-18']
-    temperatures = [0, 0.5, 1, 1.5]
     shapes = ['square', 'triangle', 'cross']
+    models = ["gpt3_5", "gpt4", "gpt4o", "gpt4o_mini"]
+    temperatures = [0, 0.5, 1, 1.5]
 
-    base_path = '../experiment_shapes'  # Adjust the base path as needed
-    bar_plot_shapes(base_path, models, temperatures, shapes)
-    print("Bar plots generated for shapes experiments.")
+    base_path = '../experiment_shapes'
+
+    # Define model groups based on log structures
+    model_groups = {
+        "gpt3_5": "group1",
+        "gpt4": "group1",
+        "gpt4o": "group2",
+        "gpt4o_mini": "group2"
+    }
+
+    # Generate line plots
+    line_plot_shapes(base_path, models, temperatures, shapes, model_groups)
 
 if __name__ == "__main__":
     main()

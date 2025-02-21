@@ -12,7 +12,7 @@ from wrapper import ask
 # ]
 # temperatures = [0, 0.5, 1, 1.5]
 
-models = ['oa:gpt-4o-2024-08-06', 'oa:gpt-4o-mini-2024-07-18']
+models = ['oa:gpt-4-1106-preview', 'oa:gpt-3.5-turbo-0125', 'oa:gpt-4o-2024-08-06', 'oa:gpt-4o-mini-2024-07-18']
 temperatures = [0, 0.5, 1, 1.5]
 
 # URL of the local server running the API
