@@ -5,6 +5,8 @@ import random
 import re
 import ast
 
+# todo: add a reset function to the game classes
+
 class TwoPlayerGame:
     def __init__(self, SpecificGameClass, ask, max_invalid_attempts=2):
         def generateInternalAsk(name):
@@ -238,17 +240,29 @@ class GuessingGame:
             self._game = "lclGenerateConstruct"
         else:
             self._game = "general"
+
+        self._GameClass = GameClass
+        self._game_instance = None
+        self.reset()
         
+    def reset(self):
         # Game instance and answer
         if self._game == "shapes":
-            self.answer = random.choice(GameClass.possible_shapes)
-            self._game_instance = GameClass(shape=self.answer)
+            self.answer = random.choice(self._GameClass.possible_shapes)
+            if self._game_instance is None:
+                self._game_instance = self._GameClass(shape=self.answer)
+            else:
+                self._game_instance.shape = self.answer
+                self._game_instance.reset_board()
         elif self._game == "countingShapes":
-            self._game_instance = GameClass()
+            if self._game_instance is None:
+                self._game_instance = self._GameClass()
+            else:
+                self._game_instance.reset_board()
             
             total_shapes_amount = random.randrange(1, 10)
-            possible_shape_symbols = list(GameClass.possible_shapes.values())
-            possible_color_symbols = list(GameClass.possible_colors.values())
+            possible_shape_symbols = list(self._GameClass.possible_shapes.values())
+            possible_color_symbols = list(self._GameClass.possible_colors.values())
 
             shapes = [
                 (random.choice(possible_shape_symbols), random.choice(possible_color_symbols))
@@ -261,12 +275,18 @@ class GuessingGame:
             # could be different then total_shapes_amount, because of overlapping shapes, or the game could stop placing new shapes, because board is full
             self.answer = self._game_instance.count_shapes()
         elif self._game == "lclGenerateConstruct":
-            self._game_instance = GameClass()
+            if self._game_instance is None:
+                self._game_instance = self._GameClass()
+            # lclGenerateConstruct doesn't need a reset, as there's no state
             self.answer = None # lclGenerateConstruct doesn't have one correct answer
         else:
-            self._game_instance = GameClass()
+            if self._game_instance is None:
+                self._game_instance = self._GameClass()
+            else:
+                # todo: test if all implement this
+                self._game_instance.reset()
             self.answer = self._game_instance.answer
-
+        
         # Setting all the correct text attributes
         self.messages = []
         
