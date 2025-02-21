@@ -1,8 +1,9 @@
 from python_api import GuessingGame
 from scripts_games.shapes import Shapes
+from scripts_games.countingShapes import CountingShapes
 
 def main():
-    game = GuessingGame(Shapes)
+    game = GuessingGame(CountingShapes)
 
     for message in game.messages:
         print(message)
@@ -12,7 +13,7 @@ def main():
     while not valid:
         guess = input(game.prompt)
 
-        valid, correct, score, answer, message = game.guess(guess)
+        valid, correct, score, message = game.guess(guess)
 
         if not valid:
             print(message)
@@ -21,8 +22,8 @@ def main():
     print("valid", valid)
     print("correct", correct)
     print("score", score)
-    print("answer", answer)
     print("message", message)
+    print("answer", game.answer)
 
 if __name__ == "__main__":
     main()
