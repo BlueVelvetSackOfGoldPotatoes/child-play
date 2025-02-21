@@ -247,8 +247,7 @@ class GuessingGame:
         if self._game == "shapes":
             self.text_state = "\n".join("".join(row) for row in self._game_instance.board)
         else:
-            # todo
-            pass
+            self.text_state = self._game_instance.get_text_state()
         
         # Prompt
         self.prompt = "Enter your guess: "
@@ -257,8 +256,7 @@ class GuessingGame:
         if self._game == "shapes":
             answer = self._shape
         else:
-            # todo
-            answer = None
+            answer = self._game_instance.answer
         
         # Parse guess
         if self._game == "shapes":
@@ -271,9 +269,6 @@ class GuessingGame:
                 message = "Invalid guess. Guess is not an integer."
                 
                 return valid, correct, score, answer, message
-        else:
-            # todo
-            pass
         
         message, valid = self._game_instance.guess(guess)
 
@@ -290,8 +285,10 @@ class GuessingGame:
 
         if not valid:
             score = 0.0
+        # todo: calculate score for different games
+        elif correct:
+            score = 1.0
         else:
-            # todo: calculate score
-            score = None
+            score = 0.0
         
         return valid, correct, score, answer, message
