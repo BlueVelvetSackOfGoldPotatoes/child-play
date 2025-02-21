@@ -342,7 +342,6 @@ class GuessingGame:
 class LCLValidity:
     def __init__(self):
         self._game_instance = LCLGame()
-        self.reset()
 
         self.prompt = (
             f"You will receive a description of a Lego structure, for instance, [(x1, y1, 'color1'), "
@@ -353,8 +352,13 @@ class LCLValidity:
             f"structure is valid then reply with valid, otherwise reply with invalid (do not justify your "
             f"answer)"
         )
+        
+        self.reset()
 
     def reset(self):
+        self._game_instance.pieces = []
+        self._pieces = []
+        
         self.answer = random.choice([True, False]) # Whether it's a valid move
         self._pieces = self._game_instance.generate_valid_or_invalid_construct(5, valid=self.answer)
 
