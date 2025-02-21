@@ -1,4 +1,4 @@
-from python_api import GuessingGame, LCLValidity
+from python_api import GuessingGame, LCLValidity, LCLGenerateConstruct
 from scripts_games.shapes import Shapes
 from scripts_games.countingShapes import CountingShapes
 
@@ -8,12 +8,13 @@ def clear():
     os.system("cls" if os.name == "nt" else "clear")
 
 def main():
-    game = GuessingGame(LCLValidity)
+    game = GuessingGame(LCLGenerateConstruct)
 
     clear()
     for message in game.messages:
         print(message)
-    print(game.text_state)
+    if game.text_state: # depends on the game
+        print(game.text_state)
 
     valid = False
     while not valid:
@@ -29,7 +30,8 @@ def main():
     print("correct", correct)
     print("score", score)
     print("message", message)
-    print("answer", game.answer)
+    if game.answer: # depends on the game
+        print("answer", game.answer)
 
 if __name__ == "__main__":
     main()
