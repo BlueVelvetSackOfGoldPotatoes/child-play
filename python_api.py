@@ -72,6 +72,18 @@ class TwoPlayerGame:
         self.turn = 0
         self.moves = []
 
+    @property
+    def finished(self):
+        return self._game_instance.game_over
+
+    @property
+    def invalid_attempts(self):
+        return self._total_invalid_attempts[0]
+
+    @property
+    def text_state(self):
+        return self._game_instance.get_text_state(self._players[0].player_id)
+
     async def random_moves(self, amount_of_turns=4):
         if self.finished:
             return
@@ -109,6 +121,13 @@ class TwoPlayerGame:
 
             if self.finished:
                 break
+
+    async def make_turns_until_finish(self):
+        if self.finished:
+            return
+
+        while not self.finished:
+            await self.make_turn()
 
     async def make_turn(self, extra_messages=[]):
         if self.finished:
@@ -197,22 +216,3 @@ class TwoPlayerGame:
 
         self.turn += 1
         self._current_player_index = 1 - self._current_player_index
-
-    async def make_turns_until_finish(self):
-        if self.finished:
-            return
-
-        while not self.finished:
-            await self.make_turn()
-
-    @property
-    def finished(self):
-        return self._game_instance.game_over
-
-    @property
-    def invalid_attempts(self):
-        return self._total_invalid_attempts[0]
-
-    @property
-    def text_state(self):
-        return self._game_instance.get_text_state(self._players[0].player_id)
