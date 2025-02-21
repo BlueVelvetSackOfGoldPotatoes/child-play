@@ -8,10 +8,16 @@ def main():
         print(message)
     print(game.text_state)
 
-    guess = input(game.prompt)
+    valid = False
+    while not valid:
+        guess = input(game.prompt)
 
-    valid, correct, score, answer, message = game.guess(guess)
+        valid, correct, score, answer, message = game.guess(guess)
 
+        if not valid:
+            print(message)
+
+    print("")
     print("valid", valid)
     print("correct", correct)
     print("score", score)
