@@ -1,5 +1,5 @@
 from main import TextPlayer, RandomPlayer, DynamicPlayer
-
+import random
 
 class TwoPlayerGame:
     def __init__(self, SpecificGameClass, ask, max_invalid_attempts=2):
@@ -216,3 +216,82 @@ class TwoPlayerGame:
 
         self.turn += 1
         self._current_player_index = 1 - self._current_player_index
+
+class GuessingGame:
+    def __init__(self, GameClass):
+        # todo: implement other games
+        
+        # Game instance
+        if GameClass.possible_shapes:
+            # The game is shapes
+            self._game = "shapes"
+            self._shape = random.choice(GameClass.possible_shapes)
+            self._game_instance = GameClass(shape=self._shape)
+        else:
+            self._game = "general"
+            self._game_instance = GameClass()
+        
+
+        # Setting all the correct text attributes
+        self.messages = []
+        
+        # Game prompt
+        self.messages.append(self._game_instance.prompt)
+        
+        # Other messages
+        if self._game == "shapes":
+            text_answers = "Answers:\n" + "\n".join([f"{i}: {option}" for i, option in enumerate(self._game_instance.answer_options)])
+            self.messages.append(text_answers)
+        
+        # Text state
+        if self._game == "shapes":
+            self.text_state = "\n".join("".join(row) for row in self._game_instance.board)
+        else:
+            # todo
+            pass
+        
+        # Prompt
+        self.prompt = "Enter your guess: "
+
+    def guess(self, guess):
+        if self._game == "shapes":
+            answer = self._shape
+        else:
+            # todo
+            answer = None
+        
+        # Parse guess
+        if self._game == "shapes":
+            try:
+                guess = int(guess)
+            except ValueError:
+                valid = False
+                correct = False
+                score = 0.0
+                message = "Invalid guess. Guess is not an integer."
+                
+                return valid, correct, score, answer, message
+        else:
+            # todo
+            pass
+        
+        message, valid = self._game_instance.guess(guess)
+
+        if valid:
+            if message == "Win":
+                correct = True
+            else:
+                correct = False
+        else:
+            correct = False
+
+        if valid:
+            message = None
+
+        if not valid:
+            score = 0.0
+        else:
+            # todo: calculate score
+            score = None
+        
+        return valid, correct, score, answer, message
