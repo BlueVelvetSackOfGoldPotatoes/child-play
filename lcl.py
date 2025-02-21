@@ -137,28 +137,85 @@ class LCLGame:
         return self.pieces
 
     def is_valid_construct(self, pieces):
+        """
+        A construct is valid if:
+        1. No pieces overlap on the same y level.
+        2. All pieces are connected in a 2D sense:
+            - Two pieces are connected if their y-coordinates differ by exactly 1
+            AND they share at least one x-position (stud).
+            - The entire set of pieces must be reachable from any one piece.
+        """
         if not pieces:
             return False  # An empty construct is considered invalid
+
+        # --------------------------------------------------
+        # 1) Overlap check
+        # --------------------------------------------------
         occupied_positions = {}
         for piece in pieces:
             if not isinstance(piece, tuple) or len(piece) != 3:
                 print(f"Invalid piece format: {piece}")
                 return False
+
             x, y, color = piece
             if not isinstance(x, int) or not isinstance(y, int) or not isinstance(color, str):
                 print(f"Invalid piece data types: {piece}")
                 return False
-            # Create a set of x positions for each piece based on its width (4 studs)
+
+            # Each piece occupies x..x+3 (4 studs in total)
             piece_positions = set(range(x, x + 4))
+
+            # Check if there's already something at this y-level
             if y in occupied_positions:
-                # Check for any overlap in x positions with existing pieces at the same y level
-                if any(pos in occupied_positions[y] for pos in piece_positions):
+                # If we find any overlap in x positions, it's invalid
+                if piece_positions & occupied_positions[y]:
                     return False  # Overlap detected
                 occupied_positions[y].update(piece_positions)
             else:
-                # Initialize occupied positions for this y level
-                occupied_positions[y] = set(piece_positions)
-        return True
+                occupied_positions[y] = piece_positions
+
+        # --------------------------------------------------
+        # 2) Connectivity check
+        # --------------------------------------------------
+        def are_connected(p1, p2):
+            x1, y1, _ = p1
+            x2, y2, _ = p2
+            # Must differ by exactly 1 in y to be vertically adjacent
+            if abs(y1 - y2) != 1:
+                return False
+            # Must share at least one stud in x-range
+            x_range1 = set(range(x1, x1 + 4))
+            x_range2 = set(range(x2, x2 + 4))
+            return not x_range1.isdisjoint(x_range2)
+
+        # Build adjacency list for BFS
+        n = len(pieces)
+        adj_list = {i: [] for i in range(n)}
+        for i in range(n):
+            for j in range(i + 1, n):
+                if are_connected(pieces[i], pieces[j]):
+                    adj_list[i].append(j)
+                    adj_list[j].append(i)
+
+        # BFS or DFS from the first piece to see if all are reachable
+        visited = set()
+        def bfs(start):
+            from collections import deque
+            queue = deque([start])
+            visited.add(start)
+            while queue:
+                current = queue.popleft()
+                for neighbor in adj_list[current]:
+                    if neighbor not in visited:
+                        visited.add(neighbor)
+                        queue.append(neighbor)
+
+        # Edge case: if there's at least one piece, we start BFS from index 0
+        bfs(0)
+
+        # If we have not visited all pieces, it's disconnected
+        return len(visited) == n
+
 
     def generate_valid_or_invalid_construct(self, num_pieces, valid=True):
         if valid:
@@ -263,7 +320,9 @@ def main():
     os.makedirs('./lcl_experiments/construct_generation', exist_ok=True)
 
     n_experiments = 100
-    models = ['oa:gpt-4o-2024-08-06', 'oa:gpt-4o-mini-2024-07-18']
+    # models = ['oa:gpt-3.5-turbo-1106', 'oa:gpt-4-1106-preview']
+    # models = ['oa:gpt-4o-2024-08-06', 'oa:gpt-4o-mini-2024-07-18']
+    models = ['oa:gpt-4o-2024-08-06', 'oa:gpt-4o-mini-2024-07-18', 'oa:gpt-3.5-turbo-1106', 'oa:gpt-4-1106-preview']
 
     temperatures = [0, 0.5, 1, 1.5]
 
@@ -327,13 +386,13 @@ def main():
                         f"valid if all Lego pieces are connected but not overlapping. A Lego piece is connected through "
                         f"interlocking pegs, not by merely touching sides. Two Lego pieces overlap when they share the "
                         f"same y-coordinate and any part of their length has the same x-coordinate. If the following "
-                        f"structure is valid then reply with valid, otherwise reply with invalid (do not justify your "
-                        f"answer): {pieces}"
+                        f"structure is valid then reply with valid, otherwise reply with invalid (do not write anything else): {pieces}"
                     )
                     player_answer = LLMPlayer(model=model, temperature=temperature).generate_llm_answer_validity(prompt)
 
                 actual_validity = game.is_valid_construct(pieces)
-                correct = (player_answer == "valid" and actual_validity) or (player_answer == "invalid" and not actual_validity)
+                actual_answer = "valid" if actual_validity else "invalid"
+                correct = (player_answer == actual_answer)
 
                 # Update the metrics
                 if correct:
