@@ -283,7 +283,6 @@ class GuessingGame:
             if self._game_instance is None:
                 self._game_instance = self._GameClass()
             else:
-                # todo: test if all implement this
                 self._game_instance.reset()
             self.answer = self._game_instance.answer
         
