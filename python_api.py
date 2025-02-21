@@ -221,16 +221,18 @@ class GuessingGame:
     def __init__(self, GameClass):
         # todo: implement other games
         
-        # Game instance
-        if GameClass.possible_shapes:
-            # The game is shapes
+        if GameClass.__name__ == "Shapes":
             self._game = "shapes"
-            self._shape = random.choice(GameClass.possible_shapes)
-            self._game_instance = GameClass(shape=self._shape)
         else:
             self._game = "general"
-            self._game_instance = GameClass()
         
+        # Game instance
+        if self._game == "shapes":
+            self.answer = random.choice(GameClass.possible_shapes)
+            self._game_instance = GameClass(shape=self.answer)
+        else:
+            self._game_instance = GameClass()
+            self.answer = self._game_instance.answer
 
         # Setting all the correct text attributes
         self.messages = []
@@ -253,11 +255,6 @@ class GuessingGame:
         self.prompt = "Enter your guess: "
 
     def guess(self, guess):
-        if self._game == "shapes":
-            answer = self._shape
-        else:
-            answer = self._game_instance.answer
-        
         # Parse guess
         if self._game == "shapes":
             try:
@@ -268,7 +265,7 @@ class GuessingGame:
                 score = 0.0
                 message = "Invalid guess. Guess is not an integer."
                 
-                return valid, correct, score, answer, message
+                return valid, correct, score, message
         
         message, valid = self._game_instance.guess(guess)
 
@@ -291,4 +288,4 @@ class GuessingGame:
         else:
             score = 0.0
         
-        return valid, correct, score, answer, message
+        return valid, correct, score, message
