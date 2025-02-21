@@ -21,8 +21,12 @@ class CountingShapes:
                              "R-[]": 0, "G-[]": 0, "B-[]": 0,  # Squares
                              "R-Δ": 0, "G-Δ": 0, "B-Δ": 0}  # Triangles
 
-        # todo
-        self.prompt = "PROMPT TODO"
+        self.prompt = (f"Counting Shapes is a game where you receive an {rows} by {rows} "
+                       f"square matrix of spaces and in it you will count shapes in the from of "
+                       f"color-shape. The possible colors are {", ".join(list(self.possible_colors.values()))} and the possible shapes are {", ".join(list(self.possible_shapes.values()))}. "
+                       f"You must count how many shapes there are in total, regardless of the color "
+                       f"and which shape it is. Only output a number for the amount. Output nothing "
+                       f"else but the number.")
 
     def reset_board(self):
         self.board = [[" " for _ in range(self.cols)] for _ in range(self.rows)]
