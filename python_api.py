@@ -219,8 +219,6 @@ class TwoPlayerGame:
 
 class GuessingGame:
     def __init__(self, GameClass):
-        # todo: implement other games
-        
         if GameClass.__name__ == "Shapes":
             self._game = "shapes"
         elif GameClass.__name__ == "CountingShapes":
@@ -235,8 +233,7 @@ class GuessingGame:
         elif self._game == "countingShapes":
             self._game_instance = GameClass()
             
-            # todo: randomize total_shapes_amount between numbers
-            total_shapes_amount = 6
+            total_shapes_amount = random.randrange(1, 10)
             possible_shape_symbols = list(GameClass.possible_shapes.values())
             possible_color_symbols = list(GameClass.possible_colors.values())
 
@@ -248,6 +245,7 @@ class GuessingGame:
             for shape in shapes:
                 self._game_instance.place_shapes(shape[0], shape[1], 1)
         
+            # could be different then total_shapes_amount, because of overlapping shapes, or the game could stop placing new shapes, because board is full
             self.answer = self._game_instance.count_shapes()
         else:
             self._game_instance = GameClass()
