@@ -5,8 +5,6 @@ import random
 import re
 import ast
 
-# todo: add a reset function to the game classes
-
 class TwoPlayerGame:
     def __init__(self, SpecificGameClass, ask, max_invalid_attempts=2):
         def generateInternalAsk(name):
@@ -51,11 +49,6 @@ class TwoPlayerGame:
         self.ask = ask
         self.max_invalid_attempts = max_invalid_attempts
 
-        self.random_turns_left = 0
-        self.winner = (
-            None  # None (if game not finished), "tie", "custom", "opponent" or "random"
-        )
-
         self._game_instance = SpecificGameClass()
 
         self._player1_normal = TextPlayer(0, generateInternalAsk("P1"), "P1")
@@ -67,16 +60,9 @@ class TwoPlayerGame:
         self._player1 = DynamicPlayer(0, generateChoosePlayer("P1"), "P1")
         self._player2 = DynamicPlayer(1, generateChoosePlayer("P2"), "P2")
 
-        self._game_instance.reset_board()
-
         self._players = [self._player1, self._player2]
-        self._current_player_index = (
-            0 if self._game_instance.current_player == "P1" else 1
-        )
-        self._total_invalid_attempts = [0, 0]
-        self._invalid_attempts = [0, 0]  # Track invalid attempts for both players
-        self.turn = 0
-        self.moves = []
+        
+        self.reset()
 
     @property
     def finished(self):
@@ -89,6 +75,22 @@ class TwoPlayerGame:
     @property
     def text_state(self):
         return self._game_instance.get_text_state(self._players[0].player_id)
+    
+    def reset(self):
+        self._game_instance.reset_board()
+        
+        self.random_turns_left = 0
+        self.winner = (
+            None  # None (if game not finished), "tie", "custom", "opponent" or "random"
+        )
+        
+        self._current_player_index = (
+            0 if self._game_instance.current_player == "P1" else 1
+        )
+        self._total_invalid_attempts = [0, 0]
+        self._invalid_attempts = [0, 0]  # Track invalid attempts for both players
+        self.turn = 0
+        self.moves = []
 
     async def random_moves(self, amount_of_turns=4):
         if self.finished:
