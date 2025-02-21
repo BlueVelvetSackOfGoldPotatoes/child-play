@@ -312,9 +312,11 @@ class GuessingGame:
 
         if not valid:
             score = 0.0
-        # todo: calculate score for different games
         elif correct:
             score = 1.0
+        elif self._game == "countingShapes":
+            difference = abs(self.answer - guess)
+            score = 1 / (pow(difference, 2) + 1)
         else:
             score = 0.0
         
