@@ -142,7 +142,7 @@ def run_benchmark():
         print("Saving benchmark results to 'benchmark_results.csv'...")
         df = pd.DataFrame(results)
         df.to_csv("benchmark_results" + model + ".csv", index=False, escapechar='\\')
-        print("Benchmarking completed. Results saved to 'benchmark_results.csv'.")
+        print(f" {model} : Benchmarking completed. Results saved to 'benchmark_results.csv'.")
 
         # Print the evaluation summary
         summary_df = pd.DataFrame(evaluation_results)
