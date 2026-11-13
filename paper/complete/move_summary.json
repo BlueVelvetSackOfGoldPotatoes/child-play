@@ -1,0 +1,191 @@
+{
+  "tictactoe|gpt4o-t0": {
+    "games": 100,
+    "replies": 349,
+    "illegal_games": 0,
+    "mismatch": 0,
+    "illegal_game_percent": 0.0
+  },
+  "connectfour|gpt4o-t0": {
+    "games": 100,
+    "replies": 486,
+    "illegal_games": 20,
+    "mismatch": 0,
+    "illegal_game_percent": 20.0
+  },
+  "battleship|gpt4o-t0": {
+    "games": 100,
+    "replies": 391,
+    "illegal_games": 100,
+    "mismatch": 0,
+    "illegal_game_percent": 100.0
+  },
+  "tictactoe|gpt4o-mini-t0": {
+    "games": 100,
+    "replies": 427,
+    "illegal_games": 4,
+    "mismatch": 0,
+    "illegal_game_percent": 4.0
+  },
+  "connectfour|gpt4o-mini-t0": {
+    "games": 100,
+    "replies": 462,
+    "illegal_games": 20,
+    "mismatch": 0,
+    "illegal_game_percent": 20.0
+  },
+  "battleship|gpt4o-mini-t0": {
+    "games": 100,
+    "replies": 333,
+    "illegal_games": 100,
+    "mismatch": 0,
+    "illegal_game_percent": 100.0
+  },
+  "tictactoe|claude-fable-5-2": {
+    "games": 100,
+    "replies": 253,
+    "illegal_games": 65,
+    "mismatch": 0,
+    "illegal_game_percent": 65.0
+  },
+  "connectfour|claude-fable-5-2": {
+    "games": 100,
+    "replies": 390,
+    "illegal_games": 63,
+    "mismatch": 0,
+    "illegal_game_percent": 63.0
+  },
+  "battleship|claude-fable-5-2": {
+    "games": 100,
+    "replies": 782,
+    "illegal_games": 100,
+    "mismatch": 0,
+    "illegal_game_percent": 100.0
+  },
+  "tictactoe|claude-opus-5-5": {
+    "games": 100,
+    "replies": 321,
+    "illegal_games": 15,
+    "mismatch": 0,
+    "illegal_game_percent": 15.0
+  },
+  "connectfour|claude-opus-5-5": {
+    "games": 100,
+    "replies": 386,
+    "illegal_games": 79,
+    "mismatch": 0,
+    "illegal_game_percent": 79.0
+  },
+  "battleship|claude-opus-5-5": {
+    "games": 100,
+    "replies": 1168,
+    "illegal_games": 98,
+    "mismatch": 0,
+    "illegal_game_percent": 98.0
+  },
+  "tictactoe|gpt-6-astra": {
+    "games": 100,
+    "replies": 324,
+    "illegal_games": 27,
+    "mismatch": 0,
+    "illegal_game_percent": 27.0
+  },
+  "connectfour|gpt-6-astra": {
+    "games": 100,
+    "replies": 411,
+    "illegal_games": 23,
+    "mismatch": 0,
+    "illegal_game_percent": 23.0
+  },
+  "battleship|gpt-6-astra": {
+    "games": 100,
+    "replies": 1950,
+    "illegal_games": 15,
+    "mismatch": 0,
+    "illegal_game_percent": 15.0
+  },
+  "tictactoe|gpt-6.1-sol": {
+    "games": 100,
+    "replies": 304,
+    "illegal_games": 38,
+    "mismatch": 0,
+    "illegal_game_percent": 38.0
+  },
+  "connectfour|gpt-6.1-sol": {
+    "games": 100,
+    "replies": 406,
+    "illegal_games": 25,
+    "mismatch": 0,
+    "illegal_game_percent": 25.0
+  },
+  "battleship|gpt-6.1-sol": {
+    "games": 100,
+    "replies": 1865,
+    "illegal_games": 25,
+    "mismatch": 0,
+    "illegal_game_percent": 25.0
+  },
+  "tictactoe|gpt-6-luna-t0": {
+    "games": 100,
+    "replies": 349,
+    "illegal_games": 19,
+    "mismatch": 0,
+    "illegal_game_percent": 19.0
+  },
+  "connectfour|gpt-6-luna-t0": {
+    "games": 100,
+    "replies": 488,
+    "illegal_games": 19,
+    "mismatch": 0,
+    "illegal_game_percent": 19.0
+  },
+  "battleship|gpt-6-luna-t0": {
+    "games": 100,
+    "replies": 681,
+    "illegal_games": 99,
+    "mismatch": 0,
+    "illegal_game_percent": 99.0
+  },
+  "tictactoe|gpt-6-luna-t0.5": {
+    "games": 100,
+    "replies": 353,
+    "illegal_games": 19,
+    "mismatch": 0,
+    "illegal_game_percent": 19.0
+  },
+  "connectfour|gpt-6-luna-t0.5": {
+    "games": 100,
+    "replies": 494,
+    "illegal_games": 20,
+    "mismatch": 0,
+    "illegal_game_percent": 20.0
+  },
+  "battleship|gpt-6-luna-t0.5": {
+    "games": 100,
+    "replies": 704,
+    "illegal_games": 99,
+    "mismatch": 0,
+    "illegal_game_percent": 99.0
+  },
+  "tictactoe|gpt-6-luna-t1": {
+    "games": 100,
+    "replies": 352,
+    "illegal_games": 16,
+    "mismatch": 0,
+    "illegal_game_percent": 16.0
+  },
+  "connectfour|gpt-6-luna-t1": {
+    "games": 100,
+    "replies": 505,
+    "illegal_games": 22,
+    "mismatch": 0,
+    "illegal_game_percent": 22.0
+  },
+  "battleship|gpt-6-luna-t1": {
+    "games": 100,
+    "replies": 645,
+    "illegal_games": 99,
+    "mismatch": 0,
+    "illegal_game_percent": 99.0
+  }
+}

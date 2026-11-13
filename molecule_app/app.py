@@ -5,7 +5,6 @@ from rdkit.Chem import rdMolDescriptors
 import os
 import random as rd
 import rdkit.Chem as rdc
-import rdkit.Chem.AllChem as rdca
 from io import BytesIO
 from PIL import Image
 import selfies as sf
@@ -14,7 +13,11 @@ from rdkit.Chem import rdCoordGen
 from rdkit import Geometry
 import numpy as np
 import Levenshtein
-import rdkit.DataStructs as rdd
+
+if __package__:
+    from .scoring import MAX_SMILES_LENGTH, score_prediction
+else:
+    from scoring import MAX_SMILES_LENGTH, score_prediction
 
 app = Flask(__name__)
 
@@ -23,18 +26,21 @@ logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s [%(levelname)s] %(message)s',
                     handlers=[
                         logging.StreamHandler(),
-                        logging.FileHandler("app.log", mode='w')
+                        logging.FileHandler("app.log", mode='a')
                     ])
 logger = logging.getLogger(__name__)
 
 generated_molecules = {}
 
-MAX_SMILES_LENGTH = 200  # Set a maximum reasonable length for a SMILES string
 
 def random_selfies(samples, length, min_atoms, max_atoms, alphabet):
     smiles_list = []
     batch_size = 100  # Generate a batch of 100 SELFIES at once
-    while len(smiles_list) < samples:
+    # Some requested atom-count ranges cannot be produced by this alphabet.
+    # Bound rejection sampling so such requests return an error rather than hang.
+    for _ in range(max(100, samples * 10)):
+        if len(smiles_list) >= samples:
+            break
         selfie_batch = ["".join(rd.choices(alphabet, k=length)) for _ in range(batch_size)]
         for random_selfie in selfie_batch:
             decoded_smiles = sf.decoder(random_selfie)
@@ -46,7 +52,7 @@ def random_selfies(samples, length, min_atoms, max_atoms, alphabet):
                     if Chem.SanitizeMol(mol, catchErrors=True) == Chem.SanitizeFlags.SANITIZE_NONE:
                         smiles = rdc.MolToSmiles(mol, kekuleSmiles=True)
                         cleaned_smiles = smiles.replace('#', '').replace('=', '')
-                        if 'H' not in cleaned_smiles:
+                        if 'H' not in cleaned_smiles and rdc.MolFromSmiles(cleaned_smiles) is not None:
                             smiles_list.append(cleaned_smiles)
                             if len(smiles_list) >= samples:
                                 break
@@ -153,35 +159,25 @@ def print_mol_ascii(mol):
     return "\n".join(ascii_representation)
 
 def calculate_similarity(smile1, smile2):
-    try:
-        mol1 = rdc.MolFromSmiles(smile1)
-        mol2 = rdc.MolFromSmiles(smile2)
-        fpgen = rdca.GetMorganGenerator(radius=2)
-        fp1 = fpgen.GetSparseCountFingerprint(mol1)
-        fp2 = fpgen.GetSparseCountFingerprint(mol2)
-        similarity = rdd.DiceSimilarity(fp1, fp2)
-        return similarity
-    except Exception as e:
-        logger.warning(f"Chemical similarity calculation failed: {e}")
-        return -1  # Return -1 for invalid SMILES
+    return score_prediction(smile1, smile2)['chemical_similarity']
+
 
 def calculate_string_distance(smile1, smile2):
-    """Calculate the Levenshtein distance between two SMILES strings."""
-    #try:
-    #    canon1 = rdc.CanonSmiles(smile1)
-    #    canon2 = rdc.CanonSmiles(smile2)
-    #except Exception as e:
-    #    logger.warning(f"SMILES canonicalization failed: {e}")
-    #    return -1  # Return -1 to indicate an error
     return Levenshtein.distance(smile1, smile2)
 
 @app.route('/generate_molecule', methods=['POST'])
 def generate_molecule():
-    data = request.json
+    data = request.get_json(silent=True)
+    if not isinstance(data, dict):
+        return jsonify({'error': 'Expected a JSON object'}), 400
     length = data.get('length', 30)
     min_atoms = data.get('min_atoms', 10)
     max_atoms = data.get('max_atoms', 15)
     format_type = data.get('format', 'ascii')
+    if any(type(value) is not int or value <= 0 for value in (length, min_atoms, max_atoms)):
+        return jsonify({'error': 'length, min_atoms and max_atoms must be positive integers'}), 400
+    if min_atoms > max_atoms or format_type not in ('ascii', 'png'):
+        return jsonify({'error': 'Invalid atom-count range or format'}), 400
 
     alphabet = list(sf.get_semantic_robust_alphabet())
     alphabet = [ai for ai in alphabet if ("+" not in ai) and ("-" not in ai)]
@@ -212,43 +208,20 @@ def generate_molecule():
 
 @app.route('/evaluate_prediction', methods=['POST'])
 def evaluate_prediction():
-    data = request.json
+    data = request.get_json(silent=True)
+    if not isinstance(data, dict):
+        return jsonify({'error': 'Expected a JSON object'}), 400
     molecule_id = data.get('molecule_id')
     predicted_smile = data.get('predicted_smile')
-
-    # Validate the SMILES string length and content
-    if len(predicted_smile) > MAX_SMILES_LENGTH or not predicted_smile:
-        return jsonify({
-            "correct": False,
-            "chemical_similarity": 0.0,
-            "string_distance": -1
-        }), 200
-    
+    if not isinstance(molecule_id, int) or isinstance(molecule_id, bool):
+        return jsonify({'error': 'Invalid molecule ID'}), 400
+    if not isinstance(predicted_smile, str):
+        return jsonify({'error': 'predicted_smile must be a string'}), 400
     original_smile = generated_molecules.get(molecule_id)
     if not original_smile:
         return jsonify({'error': 'Invalid molecule ID'}), 400
-    
-    try:
-        canon_original_smile = rdc.CanonSmiles(original_smile)
-        canon_predicted_smile = rdc.CanonSmiles(predicted_smile)
-    except Exception as e:
-        logger.warning(f"Canonicalization failed: {e}")
-        return jsonify({
-            "correct": False,
-            "chemical_similarity": -1,
-            "string_distance": calculate_string_distance(original_smile, predicted_smile),
-        }), 200
-    
-    string_distance = calculate_string_distance(canon_original_smile, canon_predicted_smile)
-    chemical_similarity = calculate_similarity(canon_original_smile, canon_predicted_smile)
 
-    is_correct = canon_original_smile == canon_predicted_smile
-    
-    return jsonify({
-        "correct": is_correct,
-        "chemical_similarity": chemical_similarity,
-        "string_distance": string_distance,
-    }), 200
+    return jsonify(score_prediction(original_smile, predicted_smile)), 200
 
 @app.route('/')
 def index():

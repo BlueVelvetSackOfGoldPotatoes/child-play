@@ -1,0 +1,22 @@
+\begin{table}[tbp]
+\centering
+\small
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{lrrrrrr}
+\toprule
+Condition & Correct & Other incorrect & Invalid & All-reply accuracy & Conditional accuracy & Penalized similarity \\
+\midrule
+GPT-4o (0) & 5 & 92 & 3 & 5.00 & 5.15 & 0.220 \\
+GPT-4o-mini (0) & 1 & 89 & 10 & 1.00 & 1.11 & 0.072 \\
+Fable 5.2 & 45 & 30 & 25 & 45.00 & 60.00 & 0.207 \\
+Opus 5.5 & 20 & 53 & 27 & 20.00 & 27.40 & -0.070 \\
+Astra & 100 & 0 & 0 & 100.00 & 100.00 & 1.000 \\
+Sol & 99 & 1 & 0 & 99.00 & 99.00 & 0.995 \\
+Luna (0) & 4 & 77 & 19 & 4.00 & 4.94 & 0.007 \\
+Luna (0.5) & 3 & 82 & 15 & 3.00 & 3.53 & 0.030 \\
+Luna (1) & 2 & 70 & 28 & 2.00 & 2.78 & -0.118 \\
+\bottomrule
+\end{tabular}}
+\caption{GtS results from complete retained responses, with 100 drawings per condition. All-reply accuracy is correct/100 and is the primary score. Conditional accuracy excludes the invalid-SMILES sentinel and is secondary. Similarity averages the Dice score with a value of $-1$ for that sentinel; empty or overlength replies instead receive 0. Both accuracy columns are percentages.}
+\label{tab:gts}
+\end{table}

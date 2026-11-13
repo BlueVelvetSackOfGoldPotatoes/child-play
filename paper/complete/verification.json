@@ -1,0 +1,266 @@
+{
+  "review_rounds": [
+    {
+      "goal": "Critique/patch and adversarial round 1: a complete, scientifically consistent first-paper comparison",
+      "changes": [
+        "Archived the superseded paper; selected a complete nine-condition cohort instead of imputing retired-model replies",
+        "Made LCL geometry explicit, enforced whole-list parsing and exact piece count, reran all 1800 affected real calls",
+        "Shared molecular scoring between app and runner; retained all 900 new molecular replies",
+        "Validated same frozen items, fleets, opponent seeds and intended-only prompt changes"
+      ],
+      "commands": [
+        ".venv/bin/python -m utils.paper_dataset",
+        ".venv/bin/python -m molecule_app.app",
+        "Actual model-generation lineage: gts-complete-run.log, legacy-complete-run.log, legacy-gts-complete-run.log, lcl-rules-run.log"
+      ],
+      "exit_codes": [
+        0,
+        0,
+        0
+      ],
+      "artifacts": [
+        "fresh_experiments/seed20261111_lcl_rules/results.jsonl",
+        "paper/complete/metrics.json",
+        "task-logs/paper-completion/live-runtime-proof.json",
+        "task-logs/paper-completion/live-model-game.json"
+      ],
+      "observations": [
+        "All 8100 selected outcomes/scores reproduced; 0 discrepancies",
+        "An actual GPT-4o game returned moves 0 0, 1 1, 2 0 and lost to the random opponent; accepted moves persisted",
+        "Real browser generated a molecular drawing; CCO scored No/0.07/5 and invalid scored No/-1/8, no browser errors"
+      ],
+      "decision": "keep",
+      "risks": [
+        "Historical retired-model records remain incomplete and are explicitly excluded, not reconstructed",
+        "Model API aliases can change future outputs"
+      ],
+      "next_todo": [
+        "Round 2: attack offline reproduction, CLI/manuscript metric agreement, layout and release provenance"
+      ],
+      "todo_triage": {
+        "gold_standard": "Every published claim derives from a complete retained cohort and the actual scoring implementation",
+        "existing_code": "Reuse frozen-input runners, game engines, LCL validator, app scorer and existing plotters",
+        "online": "No new external API behavior introduced beyond the installed SDK signature and real provider calls already executed",
+        "literature": "Prior first-paper review checked probing, prompting and benchmark sources; conclusions remain behavioral"
+      }
+    },
+    {
+      "goal": "Critique/patch and adversarial round 2: reproduce the release without credentials or hidden prompt differences",
+      "changes": [
+        "Added source/runtime/PDF hashes and shared-stimulus assertions",
+        "Fixed GtS CLI summary: accuracy now includes all replies, conditional_accuracy is separate",
+        "Bounded molecular stimulus rejection sampling",
+        "Updated README to the actual publication command and limited behavioral claims",
+        "Adjusted paragraph emergency stretch for long model identifiers"
+      ],
+      "commands": [
+        "env -u OPENAI_API_KEY -u CLAUDE_CLOUD_API_KEY PYTHON_DOTENV_DISABLED=1 .venv/bin/python -m utils.render_paper --build",
+        ".venv/bin/python fresh_gts.py --out-dir fresh_experiments/seed20261111_complete --summarize",
+        "Production molecular generator build_stimuli(1, 20261111)",
+        "pdftotext -layout paper/main_cell.pdf; pdftoppm for first page, LCL, GtS and tactics"
+      ],
+      "exit_codes": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "artifacts": [
+        "task-logs/paper-completion/offline-publication.log",
+        "task-logs/paper-completion/gts-cli-summary.json",
+        "task-logs/paper-completion/generator-output.json",
+        "paper/main_cell.pdf",
+        "paper/complete/provenance.json"
+      ],
+      "observations": [
+        "The new assertion initially compared unused Battleship text in the LCL-only stimuli against the clause variant; corrected to its actual original source; all item data and relevant prompts then agree",
+        "Offline publication command rescored 8100 responses, wrote 27 heatmaps and all comparison/outcome/tactical plots, built 19 pages",
+        "Read complete representative replies including Astra OOCC and Sol CP1SCC1; confirmed GPT-4o-mini LCL same-level overlap is correctly rejected",
+        "Read rendered manuscript text and visually inspected first page and LCL/GtS/tactical plots",
+        "GtS CLI now agrees with paper: Fable 45% primary vs 60% conditional; Opus 20% vs 27.397%"
+      ],
+      "decision": "keep",
+      "risks": [
+        "No claim of model mechanism from behavioral results",
+        "First-paper resource use does not stop other jobs; second-paper neural experiments remain separate"
+      ],
+      "next_todo": [
+        "Finish PDF layout rebuild, verify release hashes, commit only publication scope and normal push"
+      ],
+      "todo_triage": {
+        "gold_standard": "Offline command recreates actual content with explicit denominators and traceable source/PDF identities",
+        "existing_code": "Extend publication entry point and existing GtS summary; no alternate scorer or test harness",
+        "online": "Installed dependency metadata and local dotenv implementation establish runtime semantics; no speculative external behavior",
+        "literature": "No new scientific inference; numerical findings bounded to recorded task and interface"
+      }
+    }
+  ],
+  "actual_workflows": {
+    "runtime": ".venv/bin/python, no PYTHONPATH override",
+    "api": {
+      "generated": {
+        "ascii": "C                                            \n                                             \n                                             \n                                             \n                                             \n                                             \n                                             \n                                             \n                                             \n                                             \n                                             \n                                             \n                                             \n                                             \n                                             \n                                             \n                                             \n                                             \n                                             \n                                             \n                                             \n                                             \n                                             ",
+        "molecule_id": 1
+      },
+      "correct": [
+        200,
+        {
+          "chemical_similarity": 1.0,
+          "correct": true,
+          "invalid": false,
+          "string_distance": 0
+        }
+      ],
+      "invalid": [
+        200,
+        {
+          "chemical_similarity": -1.0,
+          "correct": false,
+          "invalid": true,
+          "string_distance": 7
+        }
+      ],
+      "missing": [
+        400,
+        {
+          "error": "predicted_smile must be a string"
+        }
+      ],
+      "unreachable_range": [
+        400,
+        {
+          "error": "Failed to generate a molecule"
+        }
+      ]
+    },
+    "browser_drawing": "                                                                                 \n                                                                                 \n                                                                                 \n                                                                                 \n                                                                                 \n                                                                                 \n                                                                                 \n                                                                                 \n                                                                                 \n                                                                                 \n                                                                                 \n                                                                                 \n                                                                S                \n                                                                                 \n                    B                                                            \n                                                              *                  \nN               *         *             B                                        \n      *                             *       *                                    \n            C                   C               S     *     O                    \n                                                                                 \n                                                                                 \n                                                                                 \n                                                                                 \n                                                                                 \n                                                                                 \n                                                                                 \n                                                                                 \n                                                                                 \n                                                                                 \n                                                                                 \n                                                                                 \n                                                                                 \n                                                                                 \n                                                                                 \n                                                                                 \n                                                                                 \n                                                                                 \n                                                                                 \n                                                                                 \n                                                                                 \n                                                                                 ",
+    "browser_results": "1\tCCO\tNo\t0.07\t5\n2\tinvalid\tNo\t-1.00\t8",
+    "responses": [
+      {
+        "url": "http://127.0.0.1:5000/generate_molecule",
+        "status": 200
+      },
+      {
+        "url": "http://127.0.0.1:5000/evaluate_prediction",
+        "status": 200
+      },
+      {
+        "url": "http://127.0.0.1:5000/evaluate_prediction",
+        "status": 200
+      }
+    ],
+    "browser_errors": []
+  },
+  "live_model_game": {
+    "game": [
+      [
+        "Tic-Tac-Toe is a two-player game played on a 3x3 grid. Players take turns placing their mark, X or O, in an empty square. The first player to place three of their marks in a horizontal, vertical, or diagonal row wins the game. You will play as player 1, therefore you play with X while your adversary plays with the symbol O. Your input is then a number (from 0 to 2) for the row followed by a space and another number (from 0 to 2) for the column, nothing else. Do not output anything else but the row col values else you lose.",
+        "    0   1   2\n  +---+---+---+\n0 |   |   |   |\n  +---+---+---+\n1 |   |   |   |\n  +---+---+---+\n2 |   |   |   |\n  +---+---+---+\n",
+        "LLM's turn to guess.",
+        "Valid move",
+        "    0   1   2\n  +---+---+---+\n0 | X |   |   |\n  +---+---+---+\n1 |   |   |   |\n  +---+---+---+\n2 |   |   |   |\n  +---+---+---+\n",
+        "Random's turn to guess.",
+        "Valid move",
+        "    0   1   2\n  +---+---+---+\n0 | X |   | O |\n  +---+---+---+\n1 |   |   |   |\n  +---+---+---+\n2 |   |   |   |\n  +---+---+---+\n",
+        "LLM's turn to guess.",
+        "Valid move",
+        "    0   1   2\n  +---+---+---+\n0 | X |   | O |\n  +---+---+---+\n1 |   | X |   |\n  +---+---+---+\n2 |   |   |   |\n  +---+---+---+\n",
+        "Random's turn to guess.",
+        "Valid move",
+        "    0   1   2\n  +---+---+---+\n0 | X |   | O |\n  +---+---+---+\n1 |   | X | O |\n  +---+---+---+\n2 |   |   |   |\n  +---+---+---+\n",
+        "LLM's turn to guess.",
+        "Valid move",
+        "    0   1   2\n  +---+---+---+\n0 | X |   | O |\n  +---+---+---+\n1 |   | X | O |\n  +---+---+---+\n2 | X |   |   |\n  +---+---+---+\n",
+        "Random's turn to guess.",
+        "Win",
+        "    0   1   2\n  +---+---+---+\n0 | X |   | O |\n  +---+---+---+\n1 |   | X | O |\n  +---+---+---+\n2 | X |   | O |\n  +---+---+---+\n",
+        "Game Over. Congratulations, Random wins!"
+      ],
+      [
+        0,
+        0
+      ],
+      [
+        {
+          "player": 0,
+          "move": [
+            0,
+            0
+          ],
+          "turn": 0
+        },
+        {
+          "player": 1,
+          "move": [
+            0,
+            2
+          ],
+          "turn": 1
+        },
+        {
+          "player": 0,
+          "move": [
+            1,
+            1
+          ],
+          "turn": 2
+        },
+        {
+          "player": 1,
+          "move": [
+            1,
+            2
+          ],
+          "turn": 3
+        },
+        {
+          "player": 0,
+          "move": [
+            2,
+            0
+          ],
+          "turn": 4
+        },
+        {
+          "player": 1,
+          "move": [
+            2,
+            2
+          ],
+          "turn": 5
+        }
+      ],
+      1
+    ],
+    "actual_model_calls": [
+      "System Message: Player 1 (LLM), it's your turn. Here's the current game state:\n    0   1   2\n  +---+---+---+\n0 |   |   |   |\n  +---+---+---+\n1 |   |   |   |\n  +---+---+---+\n2 |   |   |   |\n  +---+---+---+\n\nMy move is: ",
+      "LLM Response:\n0 0",
+      "System Message: Player 1 (LLM), it's your turn. Here's the current game state:\n    0   1   2\n  +---+---+---+\n0 | X |   | O |\n  +---+---+---+\n1 |   |   |   |\n  +---+---+---+\n2 |   |   |   |\n  +---+---+---+\n\nMy move is: ",
+      "LLM Response:\n1 1",
+      "System Message: Player 1 (LLM), it's your turn. Here's the current game state:\n    0   1   2\n  +---+---+---+\n0 | X |   | O |\n  +---+---+---+\n1 |   | X | O |\n  +---+---+---+\n2 |   |   |   |\n  +---+---+---+\n\nMy move is: ",
+      "LLM Response:\n2 0"
+    ]
+  },
+  "historical_availability": [
+    {
+      "model": "gpt-3.5-turbo-1106",
+      "error": "Error code: 404 - {'error': {'message': 'The model `gpt-3.5-turbo-1106` has been deprecated, learn more here: https://platform.openai.com/docs/deprecations', 'type': 'invalid_request_error', 'param': None, 'code': 'model_not_found'}}",
+      "response": null
+    },
+    {
+      "model": "gpt-4-1106-preview",
+      "error": "Error code: 404 - {'error': {'message': 'The model `gpt-4-1106-preview` has been deprecated, learn more here: https://platform.openai.com/docs/deprecations', 'type': 'invalid_request_error', 'param': None, 'code': 'model_not_found'}}",
+      "response": null
+    },
+    {
+      "model": "gpt-4o-2024-08-06",
+      "error": null,
+      "response": "0 0"
+    },
+    {
+      "model": "gpt-4o-mini-2024-07-18",
+      "error": null,
+      "response": "0 0"
+    }
+  ]
+}

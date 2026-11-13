@@ -18,6 +18,7 @@ class ConnectFour:
 
     def reset_board(self):
         self.board = [["." for _ in range(self.cols)] for _ in range(self.rows)]
+        self.last_move = (-1, -1)
         self.current_player = "P1"
         self.moves_made = []
         self.game_over = False
@@ -52,7 +53,7 @@ class ConnectFour:
     def guess(self, player_index, guess, player):
         col = guess
         if col < 0 or col >= self.cols:
-            return False
+            return "Invalid move. Out of board range.", False
         for row in reversed(range(self.rows)):
             if self.board[row][col] == ".":
                 self.board[row][col] = "X" if player_index == 0 else "O"

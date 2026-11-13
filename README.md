@@ -1,7 +1,7 @@
 # child-play
 
 ## Overview
-The ChildPlay Repository hosts the ChildPlay benchmark suite, introduced at the NeurIPS 2024 Datasets and Benchmarks Track. This benchmark is designed to evaluate the strategic reasoning and cognitive capabilities of large language models (LLMs) through non-linguistic games like Tic-Tac-Toe, Connect Four, and Battleship.
+ChildPlay evaluates model replies on text-rendered board games, shape recognition, spatial construction, and molecular graph transcription. Scores describe behavior under each task's rules and parser; they do not establish an internal reasoning mechanism.
 
 ## The repository
 .<br />
@@ -20,18 +20,21 @@ The ChildPlay Repository hosts the ChildPlay benchmark suite, introduced at the 
 
 ## Getting Started
 
-To use the ChildPlay benchmarks, clone this repository and install the required dependencies as follows:
+Use Python 3.9 for the verified runtime. Existing scientific packages can be reused through a project environment without changing the shared interpreter's dependencies:
 
 ```bash
-git clone https://github.com/yourrepository/child-play.git
+git clone https://github.com/BlueVelvetSackOfGoldPotatoes/child-play.git
 cd child-play
-conda env create -f environment.yml
-conda activate myenv
+python -m venv --system-site-packages .venv
+.venv/bin/python -m pip install -r requirements-runtime.txt
+.venv/bin/python -m molecule_app.app
 ```
+
+Open `http://127.0.0.1:5000`, select **Generate Molecule**, enter a SMILES prediction, and select **Submit Prediction**. The runtime pins a compatible Flask/Jinja pair; no temporary `PYTHONPATH` override is required. The web app, manual games, saved-data analysis, and paper rendering do not require model API credentials. Model calls read `OPENAI_API_KEY` and `CLAUDE_CLOUD_API_KEY` from an untracked `.env` file. Hugging Face inference additionally requires its model runtime; the locally installed Qwen environment can be reused for those experiments.
 
 ## Dataset Description
 
-The ChildPlay benchmark includes a series of games encoded in various formats, including ASCII for strategic board games. Each game is structured to test the models on their ability to plan, reason, and make decisions, thus we are attempting to go beyond their training on conventional linguistic datasets.
+Tasks use explicit textual encodings, including ASCII boards. The first paper separates accepted actions, game outcomes, and structural correctness. These measurements do not establish that the problems are outside a model's training distribution.
 
 ### Games Included:
 - **Tic-Tac-Toe**
@@ -43,31 +46,21 @@ The ChildPlay benchmark includes a series of games encoded in various formats, i
 
 Each game is accompanied by its initial configuration, and rules to provide a comprehensive testing framework.
 
-Most games can be found in ./scripts_games, to the exception of LCL which exists in ./lcl.py
-To run experiments involving all games except lcl, one can run main.py.
-For example, to run a shapes experiment:
+Game implementations are in `scripts_games/`, with LCL in `lcl.py` and the molecular web application in `molecule_app/`. `main.py` retains the configurable historical tournament runner; the frozen-input runners are `fresh_run.py` and `fresh_gts.py`.
+
+## Reproduce the corrected first paper
+
 ```bash
-game_runs = []
-
-shapes = ['square', 'triangle', 'cross']
-models = ['oa:gpt-3.5-turbo-1106', 'oa:gpt-4-1106-preview', 'oa:gpt-4o-2024-08-06', 'oa:gpt-4o-mini-2024-07-18']
-temperatures = [0, 0.5, 1, 1.5]
-num_games = 25
-
-for model in models:
-    for temp in temperatures:
-        for shape in shapes:
-            game_runs.append({'game_class': Shapes, 'game_name': "shapes", 'board_size': 15, 'model_name': model,  'num_games': num_games, 'experiment_name': f'experiment_shapes/{model.replace(":", "_")}/{str(temp).replace(".", "_")}/{shape}', 'temperature':temp, 'shape': shape})
+.venv/bin/python -m utils.render_paper --build
 ```
 
-Or, to run a board game experiment (should be pretty self-explanatory):
-```bash
-game_runs = [
-    {'game_class': BattleShip, 'game_name': 'battleship', 'board_size': 5, 'model_name': 'gpt-3.5-turbo-1106', 'num_games': 1, 'experiment_name': 'experiment_to_plot'}, 
-    {'game_class': ConnectFour, 'game_name': 'connectfour', 'board_size': 7, 'model_name': 'gpt-3.5-turbo-1106', 'num_games': 1000,  'experiment_name': 'experiment_board_games/experiment_connectfour_gpt3_5_oneshot_temp_0'},{'game_class': BattleShip, 'game_name': 'battleship', 'board_size': 5, 'model_name': 'gpt-3.5-turbo-1106', 'num_games': 100, 'experiment_name': 'experiment_board_games/experiment_battleship_gpt3_5_oneshot_temp_0'},
-    {'game_class': TicTacToe, 'game_name': 'tictactoe', 'board_size': 3, 'model_name': 'gpt-4-1106-preview',  'num_games': 100, 'experiment_name': 'experiment_board_games/experiment_tictactoe_gpt4_oneshot_temp_0'}
-    ]
-```
+This command makes no model calls. It replays or rescores all 8,100 selected records, checks complete condition/task/item coverage, and generates the tables, 39 plot PDFs, source hashes, and `paper/main_cell.pdf`. A TeX installation with `pdflatex`, BibTeX, and the packages named in the manuscript is needed for `--build`; omit that flag to regenerate the analysis and plots alone.
+
+The current comparison contains seven models in nine actual inference conditions. Every task has 100 trials per condition except shapes, with 300. The primary molecular accuracy includes every reply, and the overall score weights the seven tasks equally. Luna's three temperatures are reported separately. All LCL conditions use explicit brick geometry and the strict list-only generation parser.
+
+Selected ledgers and frozen inputs are under `fresh_experiments/seed20261111*`. Their exact selection and SHA-256 hashes are in `paper/complete/metrics.json` and `paper/complete/provenance.json`. All selected molecular replies come from a complete new run. The historical incomplete GPT-3.5/GPT-4-preview runs are preserved but excluded: their retired endpoints cannot recover the missing original replies. The superseded first-paper source and PDF are retained in `paper/archive/`.
+
+The second paper, `paper/main_followup.tex`, is a separate interpretability study. Its draft and pending experiments are not inputs to the first-paper reproduction command.
 
 ## Utils
 In utils one can find a registry of previous runs or experiments, some scripts that were used to produce plots currently in the paper, and the lcl visualizer (even though this is also found in lcl.py)

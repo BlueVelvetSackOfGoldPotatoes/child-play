@@ -1,4 +1,7 @@
 import os
+import sys
+from pathlib import Path
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 import json
 import argparse  # Added for command-line argument parsing
 import numpy as np
@@ -26,93 +29,16 @@ def can_win_next(board, player):
             if board[row][col] == 0:  # Check unoccupied cells
                 board[row][col] = player  # Hypothetically place player's mark
                 if is_winning_move(board, player):
-                    print(f"Winning move found for player: {player}")
                     board[row][col] = 0  # Reset after check
                     return True
                 board[row][col] = 0  # Reset after check
     return False
 
 def count_moves(game_logs):
-    rows, cols = 3, 3
-    board = np.zeros((rows, cols), dtype=int)
-    game_stats = {0: [], 1: []}
-    total_moves = {0: 0, 1: 0}
-    games_played = 0
-    last_player = None
-    current_game_moves = 0
-    win_flag = False
+    """Count immediate tactical errors with explicit episode boundaries."""
+    from utils.board_move_metrics import count_moves as count_episode_moves
+    return count_episode_moves(game_logs, 3, 3, False, is_winning_move, can_win_next)
 
-    for move in game_logs:
-        player = move["player"]
-        row, col = move["move"]
-
-        if last_player is None:
-            # Ensure the first move is always by Player 1
-            if player != 0:
-                continue
-
-        if last_player == player:
-            continue
-
-        if board[row][col] != 0:
-            continue
-
-        # Check for missed win and block opportunities before making the move
-        if current_game_moves > 0:
-            missed_win = can_win_next(board, player + 1) and not is_winning_move(board, player + 1)
-            missed_block = can_win_next(board, 3 - player - 1) and not is_winning_move(board, 3 - player - 1)
-        else:
-            missed_win = False
-            missed_block = False
-
-        last_player = player
-        board[row][col] = player + 1
-        print(f"Move made by player {player + 1} at row {row}, col {col}")
-        print(f"Board state:\n{board}")
-        
-        total_moves[player] += 1
-        current_game_moves += 1
-
-        if is_winning_move(board, player + 1):
-            print(f"Player {player + 1} wins. Resetting board ====================")
-            board = np.zeros((rows, cols), dtype=int)
-            games_played += 1
-            last_player = None
-            current_game_moves = 0
-            win_flag = True
-            continue
-        else:
-            win_flag = False
-
-        # Only record missed win/block opportunities if the move did not win the game
-        game_stats[player].append({
-            'missed_win': missed_win,
-            'missed_block': missed_block
-        })
-        print(f"Turn finished for player {player + 1} ------------------------")
-
-    if not win_flag:
-        games_played += 1
-
-    average_moves = {player: round(total_moves[player] / games_played,2) if games_played > 0 else 0 for player in total_moves}
-    missed_wins = {player: sum(stat['missed_win'] for stat in stats) for player, stats in game_stats.items()}
-    missed_blocks = {player: sum(stat['missed_block'] for stat in stats) for player, stats in game_stats.items()}
-    
-    print("*" * 50)
-    print(f"Total Moves: {total_moves}")
-    print(f"Total Games Played: {games_played}")
-    print("Missed Wins:", missed_wins)
-    print("Missed Blocks:", missed_blocks)
-    print("Average Moves Per game:", average_moves)
-    print("*" * 50)
-    print("=" * 50)
-
-    return {
-        'average_moves': average_moves,
-        'missed_wins': missed_wins,
-        'missed_blocks': missed_blocks,
-        'total_games': games_played
-    }
 
 def plot_results(models, results, conditions, plot_type='bar'):
     data_to_plot = []
@@ -272,18 +198,6 @@ def process_experiments(base_path, models, conditions):
                 print(game_stats)
 
                 model_results[condition] = game_stats
-                if model == 'gpt3_5' and condition == 'temp_0':
-                    model_results[condition] = {
-                        key: {
-                            sub_key: (
-                                v / 10 if isinstance(v, (int, float)) else {
-                                    k: (val / 10 if sub_key in ['missed_wins', 'missed_blocks'] else val)
-                                    for k, val in v.items()
-                                }
-                            ) for sub_key, v in value.items()
-                        } if key not in ['total_games', 'average_moves'] else value
-                        for key, value in model_results[condition].items()
-                    }
         all_results[model] = model_results
         
     print("=" * 80)

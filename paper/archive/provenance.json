@@ -1,0 +1,8 @@
+{
+  "status": "Superseded historical comparison, retained as provenance; not the current first-paper analysis",
+  "reason": "Incomplete historical output archives, retired models, and under-specified LCL geometry are excluded from the current fully recorded comparison",
+  "artifacts": {
+    "main_cell_prior_comparison.tex": "1ab78f5cfa87489895c671eb87d35356b59b738f6026d87778eb107a80502ec1",
+    "main_cell_prior_comparison.pdf": "9dfb56c8274edf25c74a46e3cbcad868806e35cf91f1cca0d21647ed3e5024ed"
+  }
+}

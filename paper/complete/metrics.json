@@ -1,0 +1,874 @@
+{
+  "seed": 20261111,
+  "selected_records": 8100,
+  "conditions": 9,
+  "outcome_and_scoring_mismatches": 0,
+  "metrics": {
+    "gpt4o-t0": {
+      "label": "GPT-4o (0)",
+      "model": "gpt-4o-2024-08-06",
+      "temperature": 0.0,
+      "tasks": {
+        "battleship": {
+          "n": 100,
+          "successes": 0,
+          "score": 0.0,
+          "invalid": 100,
+          "opponent_wins": 100,
+          "ties": 0
+        },
+        "tictactoe": {
+          "n": 100,
+          "successes": 85,
+          "score": 0.85,
+          "invalid": 0,
+          "opponent_wins": 14,
+          "ties": 1
+        },
+        "connectfour": {
+          "n": 100,
+          "successes": 79,
+          "score": 0.79,
+          "invalid": 20,
+          "opponent_wins": 21,
+          "ties": 0
+        },
+        "shapes": {
+          "n": 300,
+          "successes": 287,
+          "score": 0.9566666666666667,
+          "invalid": 0,
+          "by_shape": {
+            "square": 1.0,
+            "triangle": 0.99,
+            "cross": 0.88
+          }
+        },
+        "lcl_validity": {
+          "n": 100,
+          "successes": 98,
+          "score": 0.98,
+          "invalid": 0
+        },
+        "lcl_construct": {
+          "n": 100,
+          "successes": 100,
+          "score": 1.0,
+          "invalid": 0
+        },
+        "gts": {
+          "n": 100,
+          "successes": 5,
+          "score": 0.05,
+          "invalid": 3,
+          "penalized_similarity": 0.2199019670626279,
+          "conditional_accuracy": 0.05154639175257732
+        }
+      },
+      "overall": 0.6609523809523808
+    },
+    "gpt4o-mini-t0": {
+      "label": "GPT-4o-mini (0)",
+      "model": "gpt-4o-mini-2024-07-18",
+      "temperature": 0.0,
+      "tasks": {
+        "battleship": {
+          "n": 100,
+          "successes": 0,
+          "score": 0.0,
+          "invalid": 100,
+          "opponent_wins": 100,
+          "ties": 0
+        },
+        "tictactoe": {
+          "n": 100,
+          "successes": 60,
+          "score": 0.6,
+          "invalid": 4,
+          "opponent_wins": 24,
+          "ties": 16
+        },
+        "connectfour": {
+          "n": 100,
+          "successes": 80,
+          "score": 0.8,
+          "invalid": 20,
+          "opponent_wins": 20,
+          "ties": 0
+        },
+        "shapes": {
+          "n": 300,
+          "successes": 143,
+          "score": 0.4766666666666667,
+          "invalid": 0,
+          "by_shape": {
+            "square": 0.92,
+            "triangle": 0.29,
+            "cross": 0.22
+          }
+        },
+        "lcl_validity": {
+          "n": 100,
+          "successes": 50,
+          "score": 0.5,
+          "invalid": 0
+        },
+        "lcl_construct": {
+          "n": 100,
+          "successes": 0,
+          "score": 0.0,
+          "invalid": 0
+        },
+        "gts": {
+          "n": 100,
+          "successes": 1,
+          "score": 0.01,
+          "invalid": 10,
+          "penalized_similarity": 0.07242446475579911,
+          "conditional_accuracy": 0.011111111111111112
+        }
+      },
+      "overall": 0.3409523809523809
+    },
+    "claude-fable-5-2": {
+      "label": "Fable 5.2",
+      "model": "claude-fable-5-2",
+      "temperature": null,
+      "tasks": {
+        "battleship": {
+          "n": 100,
+          "successes": 0,
+          "score": 0.0,
+          "invalid": 100,
+          "opponent_wins": 100,
+          "ties": 0
+        },
+        "tictactoe": {
+          "n": 100,
+          "successes": 35,
+          "score": 0.35,
+          "invalid": 65,
+          "opponent_wins": 65,
+          "ties": 0
+        },
+        "connectfour": {
+          "n": 100,
+          "successes": 37,
+          "score": 0.37,
+          "invalid": 63,
+          "opponent_wins": 63,
+          "ties": 0
+        },
+        "shapes": {
+          "n": 300,
+          "successes": 300,
+          "score": 1.0,
+          "invalid": 0,
+          "by_shape": {
+            "square": 1.0,
+            "triangle": 1.0,
+            "cross": 1.0
+          }
+        },
+        "lcl_validity": {
+          "n": 100,
+          "successes": 53,
+          "score": 0.53,
+          "invalid": 47
+        },
+        "lcl_construct": {
+          "n": 100,
+          "successes": 100,
+          "score": 1.0,
+          "invalid": 0
+        },
+        "gts": {
+          "n": 100,
+          "successes": 45,
+          "score": 0.45,
+          "invalid": 25,
+          "penalized_similarity": 0.20714285714285716,
+          "conditional_accuracy": 0.6
+        }
+      },
+      "overall": 0.5285714285714286
+    },
+    "claude-opus-5-5": {
+      "label": "Opus 5.5",
+      "model": "claude-opus-5-5",
+      "temperature": null,
+      "tasks": {
+        "battleship": {
+          "n": 100,
+          "successes": 2,
+          "score": 0.02,
+          "invalid": 98,
+          "opponent_wins": 98,
+          "ties": 0
+        },
+        "tictactoe": {
+          "n": 100,
+          "successes": 85,
+          "score": 0.85,
+          "invalid": 15,
+          "opponent_wins": 15,
+          "ties": 0
+        },
+        "connectfour": {
+          "n": 100,
+          "successes": 21,
+          "score": 0.21,
+          "invalid": 79,
+          "opponent_wins": 79,
+          "ties": 0
+        },
+        "shapes": {
+          "n": 300,
+          "successes": 293,
+          "score": 0.9766666666666667,
+          "invalid": 7,
+          "by_shape": {
+            "square": 0.93,
+            "triangle": 1.0,
+            "cross": 1.0
+          }
+        },
+        "lcl_validity": {
+          "n": 100,
+          "successes": 66,
+          "score": 0.66,
+          "invalid": 34
+        },
+        "lcl_construct": {
+          "n": 100,
+          "successes": 100,
+          "score": 1.0,
+          "invalid": 0
+        },
+        "gts": {
+          "n": 100,
+          "successes": 20,
+          "score": 0.2,
+          "invalid": 27,
+          "penalized_similarity": -0.07,
+          "conditional_accuracy": 0.273972602739726
+        }
+      },
+      "overall": 0.5595238095238095
+    },
+    "gpt-6-astra": {
+      "label": "Astra",
+      "model": "gpt-6-astra",
+      "temperature": null,
+      "tasks": {
+        "battleship": {
+          "n": 100,
+          "successes": 63,
+          "score": 0.63,
+          "invalid": 15,
+          "opponent_wins": 37,
+          "ties": 0
+        },
+        "tictactoe": {
+          "n": 100,
+          "successes": 73,
+          "score": 0.73,
+          "invalid": 27,
+          "opponent_wins": 27,
+          "ties": 0
+        },
+        "connectfour": {
+          "n": 100,
+          "successes": 77,
+          "score": 0.77,
+          "invalid": 23,
+          "opponent_wins": 23,
+          "ties": 0
+        },
+        "shapes": {
+          "n": 300,
+          "successes": 300,
+          "score": 1.0,
+          "invalid": 0,
+          "by_shape": {
+            "square": 1.0,
+            "triangle": 1.0,
+            "cross": 1.0
+          }
+        },
+        "lcl_validity": {
+          "n": 100,
+          "successes": 100,
+          "score": 1.0,
+          "invalid": 0
+        },
+        "lcl_construct": {
+          "n": 100,
+          "successes": 100,
+          "score": 1.0,
+          "invalid": 0
+        },
+        "gts": {
+          "n": 100,
+          "successes": 100,
+          "score": 1.0,
+          "invalid": 0,
+          "penalized_similarity": 1.0,
+          "conditional_accuracy": 1.0
+        }
+      },
+      "overall": 0.8757142857142857
+    },
+    "gpt-6.1-sol": {
+      "label": "Sol",
+      "model": "gpt-6.1-sol",
+      "temperature": null,
+      "tasks": {
+        "battleship": {
+          "n": 100,
+          "successes": 56,
+          "score": 0.56,
+          "invalid": 25,
+          "opponent_wins": 44,
+          "ties": 0
+        },
+        "tictactoe": {
+          "n": 100,
+          "successes": 62,
+          "score": 0.62,
+          "invalid": 38,
+          "opponent_wins": 38,
+          "ties": 0
+        },
+        "connectfour": {
+          "n": 100,
+          "successes": 75,
+          "score": 0.75,
+          "invalid": 25,
+          "opponent_wins": 25,
+          "ties": 0
+        },
+        "shapes": {
+          "n": 300,
+          "successes": 300,
+          "score": 1.0,
+          "invalid": 0,
+          "by_shape": {
+            "square": 1.0,
+            "triangle": 1.0,
+            "cross": 1.0
+          }
+        },
+        "lcl_validity": {
+          "n": 100,
+          "successes": 100,
+          "score": 1.0,
+          "invalid": 0
+        },
+        "lcl_construct": {
+          "n": 100,
+          "successes": 100,
+          "score": 1.0,
+          "invalid": 0
+        },
+        "gts": {
+          "n": 100,
+          "successes": 99,
+          "score": 0.99,
+          "invalid": 0,
+          "penalized_similarity": 0.9945,
+          "conditional_accuracy": 0.99
+        }
+      },
+      "overall": 0.8457142857142858
+    },
+    "gpt-6-luna-t0": {
+      "label": "Luna (0)",
+      "model": "gpt-6-luna",
+      "temperature": 0.0,
+      "tasks": {
+        "battleship": {
+          "n": 100,
+          "successes": 1,
+          "score": 0.01,
+          "invalid": 99,
+          "opponent_wins": 99,
+          "ties": 0
+        },
+        "tictactoe": {
+          "n": 100,
+          "successes": 68,
+          "score": 0.68,
+          "invalid": 19,
+          "opponent_wins": 26,
+          "ties": 6
+        },
+        "connectfour": {
+          "n": 100,
+          "successes": 80,
+          "score": 0.8,
+          "invalid": 19,
+          "opponent_wins": 20,
+          "ties": 0
+        },
+        "shapes": {
+          "n": 300,
+          "successes": 298,
+          "score": 0.9933333333333333,
+          "invalid": 0,
+          "by_shape": {
+            "square": 1.0,
+            "triangle": 1.0,
+            "cross": 0.98
+          }
+        },
+        "lcl_validity": {
+          "n": 100,
+          "successes": 85,
+          "score": 0.85,
+          "invalid": 0
+        },
+        "lcl_construct": {
+          "n": 100,
+          "successes": 100,
+          "score": 1.0,
+          "invalid": 0
+        },
+        "gts": {
+          "n": 100,
+          "successes": 4,
+          "score": 0.04,
+          "invalid": 19,
+          "penalized_similarity": 0.007176808487546251,
+          "conditional_accuracy": 0.04938271604938271
+        }
+      },
+      "overall": 0.6247619047619049
+    },
+    "gpt-6-luna-t0.5": {
+      "label": "Luna (0.5)",
+      "model": "gpt-6-luna",
+      "temperature": 0.5,
+      "tasks": {
+        "battleship": {
+          "n": 100,
+          "successes": 1,
+          "score": 0.01,
+          "invalid": 99,
+          "opponent_wins": 99,
+          "ties": 0
+        },
+        "tictactoe": {
+          "n": 100,
+          "successes": 69,
+          "score": 0.69,
+          "invalid": 19,
+          "opponent_wins": 26,
+          "ties": 5
+        },
+        "connectfour": {
+          "n": 100,
+          "successes": 80,
+          "score": 0.8,
+          "invalid": 20,
+          "opponent_wins": 20,
+          "ties": 0
+        },
+        "shapes": {
+          "n": 300,
+          "successes": 299,
+          "score": 0.9966666666666667,
+          "invalid": 0,
+          "by_shape": {
+            "square": 1.0,
+            "triangle": 1.0,
+            "cross": 0.99
+          }
+        },
+        "lcl_validity": {
+          "n": 100,
+          "successes": 77,
+          "score": 0.77,
+          "invalid": 0
+        },
+        "lcl_construct": {
+          "n": 100,
+          "successes": 100,
+          "score": 1.0,
+          "invalid": 0
+        },
+        "gts": {
+          "n": 100,
+          "successes": 3,
+          "score": 0.03,
+          "invalid": 15,
+          "penalized_similarity": 0.03021313855783507,
+          "conditional_accuracy": 0.03529411764705882
+        }
+      },
+      "overall": 0.6138095238095238
+    },
+    "gpt-6-luna-t1": {
+      "label": "Luna (1)",
+      "model": "gpt-6-luna",
+      "temperature": 1.0,
+      "tasks": {
+        "battleship": {
+          "n": 100,
+          "successes": 1,
+          "score": 0.01,
+          "invalid": 99,
+          "opponent_wins": 99,
+          "ties": 0
+        },
+        "tictactoe": {
+          "n": 100,
+          "successes": 73,
+          "score": 0.73,
+          "invalid": 16,
+          "opponent_wins": 22,
+          "ties": 5
+        },
+        "connectfour": {
+          "n": 100,
+          "successes": 78,
+          "score": 0.78,
+          "invalid": 22,
+          "opponent_wins": 22,
+          "ties": 0
+        },
+        "shapes": {
+          "n": 300,
+          "successes": 298,
+          "score": 0.9933333333333333,
+          "invalid": 0,
+          "by_shape": {
+            "square": 1.0,
+            "triangle": 1.0,
+            "cross": 0.98
+          }
+        },
+        "lcl_validity": {
+          "n": 100,
+          "successes": 80,
+          "score": 0.8,
+          "invalid": 0
+        },
+        "lcl_construct": {
+          "n": 100,
+          "successes": 96,
+          "score": 0.96,
+          "invalid": 0
+        },
+        "gts": {
+          "n": 100,
+          "successes": 2,
+          "score": 0.02,
+          "invalid": 28,
+          "penalized_similarity": -0.11838776679452638,
+          "conditional_accuracy": 0.027777777777777776
+        }
+      },
+      "overall": 0.6133333333333333
+    }
+  },
+  "tactical": {
+    "tictactoe": {
+      "claude-fable-5-2": {
+        "average_moves": {
+          "0": 1.88,
+          "1": 1.53
+        },
+        "missed_wins": {
+          "0": 0.0,
+          "1": 0.0
+        },
+        "missed_blocks": {
+          "0": 0.0,
+          "1": 0.45
+        },
+        "total_games": 100
+      },
+      "gpt-6-astra": {
+        "average_moves": {
+          "0": 2.97,
+          "1": 2.24
+        },
+        "missed_wins": {
+          "0": 0.0,
+          "1": 0.0
+        },
+        "missed_blocks": {
+          "0": 0.0,
+          "1": 0.39
+        },
+        "total_games": 100
+      },
+      "gpt-6.1-sol": {
+        "average_moves": {
+          "0": 2.66,
+          "1": 2.04
+        },
+        "missed_wins": {
+          "0": 0.0,
+          "1": 0.0
+        },
+        "missed_blocks": {
+          "0": 0.0,
+          "1": 0.34
+        },
+        "total_games": 100
+      },
+      "gpt-6-luna-t0": {
+        "average_moves": {
+          "0": 3.3,
+          "1": 2.56
+        },
+        "missed_wins": {
+          "0": 0.26,
+          "1": 0.08
+        },
+        "missed_blocks": {
+          "0": 0.15,
+          "1": 0.86
+        },
+        "total_games": 100
+      },
+      "gpt-6-luna-t0.5": {
+        "average_moves": {
+          "0": 3.34,
+          "1": 2.6
+        },
+        "missed_wins": {
+          "0": 0.31,
+          "1": 0.08
+        },
+        "missed_blocks": {
+          "0": 0.15,
+          "1": 0.9
+        },
+        "total_games": 100
+      },
+      "gpt-6-luna-t1": {
+        "average_moves": {
+          "0": 3.36,
+          "1": 2.58
+        },
+        "missed_wins": {
+          "0": 0.28,
+          "1": 0.09
+        },
+        "missed_blocks": {
+          "0": 0.14,
+          "1": 0.88
+        },
+        "total_games": 100
+      },
+      "claude-opus-5-5": {
+        "average_moves": {
+          "0": 3.06,
+          "1": 2.21
+        },
+        "missed_wins": {
+          "0": 0.0,
+          "1": 0.0
+        },
+        "missed_blocks": {
+          "0": 0.0,
+          "1": 0.66
+        },
+        "total_games": 100
+      },
+      "gpt4o-t0": {
+        "average_moves": {
+          "0": 3.49,
+          "1": 2.63
+        },
+        "missed_wins": {
+          "0": 0.39,
+          "1": 0.11
+        },
+        "missed_blocks": {
+          "0": 0.21,
+          "1": 0.92
+        },
+        "total_games": 100
+      },
+      "gpt4o-mini-t0": {
+        "average_moves": {
+          "0": 4.23,
+          "1": 3.47
+        },
+        "missed_wins": {
+          "0": 1.06,
+          "1": 0.3
+        },
+        "missed_blocks": {
+          "0": 0.47,
+          "1": 1.11
+        },
+        "total_games": 100
+      }
+    },
+    "connectfour": {
+      "gpt-6-astra": {
+        "average_moves": {
+          "0": 3.88,
+          "1": 3.11
+        },
+        "missed_wins": {
+          "0": 0.0,
+          "1": 0.0
+        },
+        "missed_blocks": {
+          "0": 0.0,
+          "1": 0.7
+        },
+        "total_games": 100
+      },
+      "gpt-6.1-sol": {
+        "average_moves": {
+          "0": 3.81,
+          "1": 3.06
+        },
+        "missed_wins": {
+          "0": 0.01,
+          "1": 0.0
+        },
+        "missed_blocks": {
+          "0": 0.0,
+          "1": 0.7
+        },
+        "total_games": 100
+      },
+      "gpt-6-luna-t0": {
+        "average_moves": {
+          "0": 4.69,
+          "1": 3.89
+        },
+        "missed_wins": {
+          "0": 0.03,
+          "1": 0.01
+        },
+        "missed_blocks": {
+          "0": 0.02,
+          "1": 0.83
+        },
+        "total_games": 100
+      },
+      "gpt-6-luna-t0.5": {
+        "average_moves": {
+          "0": 4.74,
+          "1": 3.94
+        },
+        "missed_wins": {
+          "0": 0.08,
+          "1": 0.0
+        },
+        "missed_blocks": {
+          "0": 0.0,
+          "1": 0.82
+        },
+        "total_games": 100
+      },
+      "gpt-6-luna-t1": {
+        "average_moves": {
+          "0": 4.83,
+          "1": 4.05
+        },
+        "missed_wins": {
+          "0": 0.09,
+          "1": 0.01
+        },
+        "missed_blocks": {
+          "0": 0.01,
+          "1": 0.87
+        },
+        "total_games": 100
+      },
+      "claude-fable-5-2": {
+        "average_moves": {
+          "0": 3.27,
+          "1": 2.9
+        },
+        "missed_wins": {
+          "0": 0.0,
+          "1": 0.0
+        },
+        "missed_blocks": {
+          "0": 0.0,
+          "1": 0.6
+        },
+        "total_games": 100
+      },
+      "claude-opus-5-5": {
+        "average_moves": {
+          "0": 3.07,
+          "1": 2.86
+        },
+        "missed_wins": {
+          "0": 0.0,
+          "1": 0.0
+        },
+        "missed_blocks": {
+          "0": 0.0,
+          "1": 0.42
+        },
+        "total_games": 100
+      },
+      "gpt4o-t0": {
+        "average_moves": {
+          "0": 4.66,
+          "1": 3.87
+        },
+        "missed_wins": {
+          "0": 0.09,
+          "1": 0.12
+        },
+        "missed_blocks": {
+          "0": 0.1,
+          "1": 0.88
+        },
+        "total_games": 100
+      },
+      "gpt4o-mini-t0": {
+        "average_moves": {
+          "0": 4.42,
+          "1": 3.62
+        },
+        "missed_wins": {
+          "0": 0.0,
+          "1": 0.01
+        },
+        "missed_blocks": {
+          "0": 0.01,
+          "1": 0.8
+        },
+        "total_games": 100
+      }
+    }
+  },
+  "molecules": {
+    "draws": 100,
+    "unique_canonical_graphs": 100,
+    "heavy_atoms_min": 4,
+    "heavy_atoms_median": 6.0,
+    "heavy_atoms_max": 10
+  },
+  "sources": {
+    "fresh_experiments/seed20261111/results.jsonl": "e6ccb77e52e4be1a85a80b7ca0a80d6d1683adc83fb5cbf777abd36dcc6132e9",
+    "fresh_experiments/seed20261111_bs_clause/results.jsonl": "2ba420e4db5410c7dcbbdd2d2d60f6add1d217b64795ab0895a9dd6428654e8b",
+    "fresh_experiments/seed20261111_complete/gts_results.jsonl": "80e59affc5bdf74244ca4c84ba981c87a2417ad370d80991b3ef712e89de61da",
+    "fresh_experiments/seed20261111_legacy_complete/results.jsonl": "14f0a5e6cabed5c609a81f07537314ae0037fb0e29948ffaa7c4c01546089138",
+    "fresh_experiments/seed20261111_legacy_complete/gts_results.jsonl": "af0b2dbd28df299ec8449e7ca5e2c61285f6429fb5384e60c2d255a532cac5e0",
+    "fresh_experiments/seed20261111_lcl_rules/results.jsonl": "5b85e0073504ed4f013df6f824122fdb744a12db5242f152c2f29a6e2b8018e3"
+  },
+  "stimuli": {
+    "fresh_experiments/seed20261111/stimuli.json": "e1c5726983937709890f33f5694c151f0f5d777c985651d3b599968efeb70046",
+    "fresh_experiments/seed20261111_bs_clause/stimuli.json": "d210152e56cca7fa2bc7ee6049c923dddc2a7ef5ffdfcf37d9c3fa4e333d993a",
+    "fresh_experiments/seed20261111/gts_stimuli.json": "e77e97619c399a4a7098e746aa0ec3af1035db2f7e432b9861d19fefac1ec6ed",
+    "fresh_experiments/seed20261111_legacy_complete/stimuli.json": "d210152e56cca7fa2bc7ee6049c923dddc2a7ef5ffdfcf37d9c3fa4e333d993a",
+    "fresh_experiments/seed20261111_lcl_rules/stimuli.json": "14a8f6d01198b3e9774a73397cd0967b5fd2c9cc2c2156ccfa74c86ed8f35559"
+  },
+  "selection": "All retained complete current comparisons; GtS is a full new run. Historical incomplete/retired-model runs are preserved and excluded from this comparison."
+}

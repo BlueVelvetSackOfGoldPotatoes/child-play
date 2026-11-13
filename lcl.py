@@ -158,7 +158,7 @@ class LCLGame:
                 return False
 
             x, y, color = piece
-            if not isinstance(x, int) or not isinstance(y, int) or not isinstance(color, str):
+            if type(x) is not int or type(y) is not int or not isinstance(color, str):
                 print(f"Invalid piece data types: {piece}")
                 return False
 
@@ -316,15 +316,14 @@ class LLMPlayer:
 def main():
     game = LCLGame()
     visualizer = LCLVisualizer()
-    os.makedirs('./lcl_experiments/validity_experiments', exist_ok=True)
-    os.makedirs('./lcl_experiments/construct_generation', exist_ok=True)
+    os.makedirs('./lcl_experiments/validity_experiments_o1', exist_ok=True)
+    os.makedirs('./lcl_experiments/construct_generation_o1', exist_ok=True)
 
     n_experiments = 100
-    # models = ['oa:gpt-3.5-turbo-1106', 'oa:gpt-4-1106-preview']
-    # models = ['oa:gpt-4o-2024-08-06', 'oa:gpt-4o-mini-2024-07-18']
-    models = ['oa:gpt-4o-2024-08-06', 'oa:gpt-4o-mini-2024-07-18', 'oa:gpt-3.5-turbo-1106', 'oa:gpt-4-1106-preview']
+    # models = ['oa:gpt-4o-2024-08-06', 'oa:gpt-4o-mini-2024-07-18', 'oa:gpt-3.5-turbo-1106', 'oa:gpt-4-1106-preview']
+    models = ['oa:o1-mini-2024-09-12', 'oa:oa:o1-2024-12-17']
 
-    temperatures = [0, 0.5, 1, 1.5]
+    temperatures = [1]
 
     all_validity_results = []
     all_construct_results = []
@@ -352,7 +351,7 @@ def main():
 
                 print(f"{model} answer: {pieces}")
 
-                validity = game.is_valid_construct(pieces)
+                validity = len(pieces) == n_pieces and game.is_valid_construct(pieces)
 
                 # Update the metrics based on validity
                 if validity:
@@ -416,10 +415,15 @@ def main():
 
     df_validity = pd.DataFrame(all_validity_results)
     df_construct = pd.DataFrame(all_construct_results)
-    df_construct.to_csv("df_construct_4o_experiments.csv", index=False)
-    df_validity.to_csv("df_validity_4o_experiments.csv", index=False)
-    print(df_validity.head(10))
-    print(df_construct.head(10))
+
+    # save outputs into the correct experiment folders
+    construct_dir = './lcl_experiments/construct_generation'
+    validity_dir  = './lcl_experiments/validity_experiments'
+    os.makedirs(construct_dir, exist_ok=True)
+    os.makedirs(validity_dir,  exist_ok=True)
+
+    df_construct.to_csv(os.path.join(construct_dir, 'construct_results_may_2025.csv'), index=False)
+    df_validity .to_csv(os.path.join(validity_dir,  'validity_results_may_2025.csv'),  index=False)
 
     # Save metrics to a file
     game.save_metrics('lcl_experiments/metrics.json')

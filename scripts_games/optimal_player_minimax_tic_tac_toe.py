@@ -92,8 +92,9 @@ def play_game(_):
             action = random.choice(env.available_actions())
 
         row, col = action
+        acting_player = env.current_player
         state, reward, done = env.step(action)
-        if env.current_player == -1:  # Last move was by the Minimax
+        if acting_player == 1:
             move_heatmap[row, col] += 1
 
     return reward, move_heatmap

@@ -31,7 +31,7 @@ class BattleShip:
         self.place_ships(self.ship_board_p2, self.ships_p2)
         self.game_over = False
         self.current_player = "P1"
-        self.prompt = f"Battleship is a two-player guessing game where each player has a fleet of ships on a secret grid and then takes turns guessing the locations of the opponent's ships. The objective is to sink all of the opponent's ships by correctly guessing their locations. O's in a board mean that the player selected a square to attack and there was no ship there - it's a miss. Had there been a ship there, instead of a O you would see an X. In your board, an <S> signifies a ship position, and a <~> signifies sea. Your input is just two numbers with a space in between, one for the row (from 0 to {self.board_size-1}) and one for the column (from 0 to {self.board_size-1}), like: 0 0, nothing else. Do not output anything else but the row col values."
+        self.prompt = f"Battleship is a two-player guessing game where each player has a fleet of ships on a secret grid and then takes turns guessing the locations of the opponent's ships. The objective is to sink all of the opponent's ships by correctly guessing their locations. O's in a board mean that the player selected a square to attack and there was no ship there - it's a miss. Had there been a ship there, instead of a O you would see an X. In your board, an <S> signifies a ship position, and a <~> signifies sea. Your input is just two numbers with a space in between, one for the row (from 0 to {self.board_size-1}) and one for the column (from 0 to {self.board_size-1}), like: 0 0, nothing else. Do not output anything else but the row col values else you lose."
 
     @property
     def board(self):
@@ -39,7 +39,7 @@ class BattleShip:
     
     def reset_board(self):
         """Resets the game to its initial state."""
-        self.initialize_game()
+        self.initialize_game({"board_size": self.board_size, "debug": getattr(self, "debug", False)})
 
     def place_ships(self, ship_board: List[List[str]], ships_list: List[Tuple[int, int]]) -> None:
         """
@@ -121,24 +121,40 @@ class BattleShip:
 
         return out
 
-    def guess(self, player: int, guess: Tuple[int, int], playerobj) -> bool:
+    def guess(self, player: int, guess: Tuple[int, int], playerobj) -> Tuple[str, bool]:
+        """Fire at one cell and report whether the shot was legal.
+
+        A cell that was already fired at is rejected and left unchanged.
+        Rewriting it used to turn a recorded hit back into a miss, so a
+        later shot could unsink a ship. The caller treats a rejected shot
+        as an immediate loss, which is the same rule the text parser uses.
+
+        Args:
+            player: 0 for the side that owns guess_board_p1, 1 for the other.
+            guess: Row and column, both zero-based.
+            playerobj: Unused. Present because the shared game loop passes it.
+
+        Returns:
+            tuple[str, bool]: A message and whether the shot was applied.
+        """
         row, col = guess
+        if not (0 <= row < self.board_size and 0 <= col < self.board_size):
+            return "Invalid", False
 
         guess_board = self.guess_board_p1 if player == 0 else self.guess_board_p2
         target_board = self.ship_board_p2 if player == 0 else self.ship_board_p1
+        if guess_board[row][col] != "~":
+            return "Invalid", False
 
-        hit_marker = "X" if self.current_player == "P1" else "X"
-        miss_marker = "O" if self.current_player == "P1" else "O"
-
-        if target_board[row][col] == 'S':
-            guess_board[row][col] = hit_marker
-            target_board[row][col] = hit_marker
+        if target_board[row][col] == "S":
+            guess_board[row][col] = "X"
+            target_board[row][col] = "X"
             if self.check_win():
                 self.game_over = True
                 return "Win", True
         else:
-            guess_board[row][col] = miss_marker
-            
+            guess_board[row][col] = "O"
+
         self.switch_player()
         return "Valid move", True
     

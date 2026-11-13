@@ -6,7 +6,7 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import time
 import pandas as pd
-import signal  # <-- NEW IMPORT for timeouts
+import signal
 
 from scripts_games.connectfour import ConnectFour
 from scripts_games.battleship import BattleShip
@@ -15,9 +15,20 @@ from scripts_games.shapes import Shapes, bar_plot_shapes
 
 from wrapper import ask
 
-# models = ['oa:gpt-3.5-turbo-1106', 'oa:gpt-4-1106-preview']
-# models = ['oa:gpt-4o-2024-08-06', 'oa:gpt-4o-mini-2024-07-18']
-models = ['oa:o1-mini-2024-09-12', 'oa:o1-2024-12-17', 'oa:o3-mini-2025-01-31']
+# 'oa:o3-mini-2025-01-31', 
+# 'oa:o3-2025-04-16',
+# 'oa:o4-mini-2025-04-16', 
+# 'oa:gpt-4.1-2025-04-14'
+
+models = ['oa:gpt-4o-2024-08-06', 'oa:gpt-4o-mini-2024-07-18']
+model_tags = {
+    # 'oa:o3-mini-2025-01-31': 'GPTo3-mini',
+    # 'oa:o1-mini-2024-09-12': 'GPTo1-mini',
+    'oa:gpt-4o-mini-2024-07-18': 'gpt4o_mini',
+    # 'oa:o1-2024-12-17':      'GPTo1',
+    # 'oa:o3-2025-04-16':      'GPTo3',
+    'oa:gpt-4o-2024-08-06': 'gpt4o',
+}
 
 temperatures = [0, 0.5, 1, 1.5]
 
@@ -76,11 +87,11 @@ class LLMPlayer(PlayerBase):
     def make_guess(self, game, previous_play):
         api_messages = [
             {
-                "role": "system",
+                "role": "user",
                 "content": f"You are a player in a game of {self.game.name}. {self.game.prompt}."
             }
         ]
-        current_state = game.get_text_state(None)
+        current_state = game.get_text_state(self.player_id)
         prompt = (
             f"Player {self.player_id + 1} ({self.player_name}), it's your turn. "
             f"Here's the current game state:\n{current_state}\nMy move is: "
@@ -168,7 +179,8 @@ class TextPlayer(PlayerBase):
                     return col if 0 <= col < game.cols and game.board[0][col] == '.' else None
                 else:
                     row, col = map(int, text_guess.split())
-                    return (row, col) if 0 <= row < game.board_size and 0 <= col < game.board_size and game.board[row][col] == " " else None
+                    available = "~" if game.name == "battleship" else " "
+                    return (row, col) if 0 <= row < game.board_size and 0 <= col < game.board_size and game.board[row][col] == available else None
             except (ValueError, IndexError):
                 # If input parsing fails or doesn't meet the criteria, inform the player and allow another attempt
                 self.collect_message("Invalid input. Please enter the column number for ConnectFour or row and column numbers separated by a space for other games.")
@@ -350,6 +362,12 @@ def play_one_game(game_instance, player1, player2, size, max_invalid_attempts=1,
                             "result": "Loss"
                         })
                         wrong_moves[current_player_index] += 1
+                else:
+                    move_log.append({
+                        "player": current_player_index,
+                        "move": guess,
+                        "turn": turn,
+                    })
             # Handle game over state
             if game_instance.game_over:
                 final_state_message = game_instance.get_text_state(current_player_index)
@@ -566,12 +584,29 @@ def main():
 
     # Other games setup (e.g., Battleship, ConnectFour)
     board_games_enabled = True  # Set to False if you don't want to run other games
-    if board_games_enabled:
-        game_runs += [
-            {'game_class': TicTacToe, 'game_name': 'tictactoe', 'board_size': 3, 'model_name': 'oa:gpt-4o-2024-08-06', 'num_games': 100, 'experiment_name': 'experiment_board_games/experiment_connectfour_gpt4o_oneshot_temp_1.5', 'temperature': 1.5},
-            {'game_class': TicTacToe, 'game_name': 'tictactoe', 'board_size': 3, 'model_name': 'oa:gpt-4o-mini-2024-07-18', 'num_games': 100, 'experiment_name': 'experiment_board_games/experiment_tictactoe_gpt4o_oneshot_temp_0', 'temperature': 0},
-        ]
+    board_games = [
+        (TicTacToe,   'tictactoe',    3),
+        (ConnectFour, 'connectfour',  7),
+        (BattleShip,  'battleship',  10),
+    ]
 
+    if board_games_enabled:
+        for game_cls, game_name, size in board_games:
+            for model in models:
+                tag = model_tags[model]
+                for temp in temperatures:
+                    exp_name = f"experiment_board_games/experiment_{game_name}_{tag}_oneshot_temp_{str(temp).replace('.','_')}"
+                    os.makedirs(exp_name, exist_ok=True)
+                    game_runs.append({
+                        'game_class':      game_cls,
+                        'game_name':       game_name,
+                        'board_size':      size,
+                        'model_name':      model,
+                        'num_games':       num_games,
+                        'experiment_name': exp_name,
+                        'temperature':     temp,
+                    })
+                    
     if not game_runs:
         print("No experiments to run. Please enable either shapes experiments, other games, or both.")
         return

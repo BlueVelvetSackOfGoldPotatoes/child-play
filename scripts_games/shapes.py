@@ -132,6 +132,7 @@ class Shapes:
         self.reset_board()
 
     def reset_board(self):
+        self.current_player = "P1"
         self.board = create_board(self.board_size, self.board_size)
 
         # Draw the specified shape randomly on the board
@@ -168,27 +169,51 @@ class Shapes:
         self.game_over = False
         self.won = False
 
-    def get_text_state(self):
+    def get_text_state(self, player_index=None):
         text_board = "\n".join("".join(row) for row in self.board)
         text_answers = "Answers:\n" + "\n".join([f"{i}: {option}" for i, option in enumerate(self.answer_options)])
         prompt = text_board + "\n\n" + text_answers
         return prompt
 
-    def guess(self, guess):
+    def guess(self, player_index, guess=None, playerobj=None):
+        """Score one multiple-choice guess and end the game.
+
+        The shared game loop passes the player index, the chosen option, and
+        the player object. The original shape script passes only the option
+        index.
+
+        Args:
+            player_index: Player index, or the option index when guess is omitted.
+            guess: Index into the answer options. When omitted, player_index is that index.
+            playerobj: Unused. The shared game loop passes the player object.
+
+        Returns:
+            tuple[str, bool]: Win or Loss when the index is in range, otherwise
+            an invalid-move message and False.
+        """
+        if guess is None:
+            guess = player_index
         if guess < 0 or guess >= len(self.answer_options):
             return "Invalid move. Out of range.", False
 
+        self.game_over = True
         if self.answer_options[guess] == self.shape:
-            self.game_over = True
             self.won = True
             return "Win", True
-
-        self.game_over = True
-        self.won = False
-        return "Loss", True
+        else:
+            self.won = False
+            return "Loss", True
 
     def check_win(self) -> bool:
         return self.game_over and self.won
 
     def check_loss(self) -> bool:
         return self.game_over and not self.won
+    
+    def check_tie(self) -> bool:
+        """Return whether the game ended in a tie.
+
+        Returns:
+            bool: Always False. A shape guess is either correct or incorrect.
+        """
+        return False

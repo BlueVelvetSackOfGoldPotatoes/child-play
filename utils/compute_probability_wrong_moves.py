@@ -1,39 +1,43 @@
-import numpy as np
+"""Report illegal-reply rates from the archived board-game messages.
 
-# Temperature values
-temperature = np.array([0.0, 0.5, 1.0, 1.5])
+Each game ends on its first illegal reply, so the invalid-game share is
+well-defined. A per-move probability or mean episode length requires actual
+move counts; this script does not estimate them from placeholder arrays.
+"""
 
-# Incorrect Moves for each game (from extracted data)
-incorrect_moves_tictactoe = np.array([47, 76, 76, 81])
-incorrect_moves_connect_four = np.array([36, 20, 13, 12])
-incorrect_moves_battleship = np.array([86, 89, 97, 93])
+import argparse
+import json
+from pathlib import Path
 
-# Average Moves for each game (from extracted data)
-average_moves_tictactoe = np.array([1, 2, 3, 4])
-average_moves_connect_four = np.array([2, 4, 6, 8])
-average_moves_battleship = np.array([10, 8, 3, 3])
+import pandas as pd
 
-# Total number of moves (sum of average moves as an estimate for simplicity)
-total_moves_tictactoe = np.sum(average_moves_tictactoe)
-total_moves_connect_four = np.sum(average_moves_connect_four)
-total_moves_battleship = np.sum(average_moves_battleship)
+from plot_fresh_outcome_lines import OLD_CONDITIONS, OLD_DIR, OLD_MODELS, _trial_outcome
 
-# Calculate the probability of incorrect moves
-prob_incorrect_tictactoe = incorrect_moves_tictactoe / total_moves_tictactoe
-prob_incorrect_connect_four = incorrect_moves_connect_four / total_moves_connect_four
-prob_incorrect_battleship = incorrect_moves_battleship / total_moves_battleship
 
-# Calculate the average number of steps
-avg_steps_tictactoe = np.mean(average_moves_tictactoe)
-avg_steps_connect_four = np.mean(average_moves_connect_four)
-avg_steps_battleship = np.mean(average_moves_battleship)
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--out', type=Path, help='Optional destination CSV')
+    args = parser.parse_args()
+    rows = []
+    for game in ('tictactoe', 'connectfour', 'battleship'):
+        for model in OLD_MODELS:
+            for condition in OLD_CONDITIONS:
+                folder = OLD_DIR / f'experiment_{game}_{model}_oneshot_{condition}'
+                messages = json.loads((folder / f'game_messages_{game}.json').read_text())
+                flags = [_trial_outcome(item) for item in messages]
+                illegal = sum(item[3] for item in flags)
+                rows.append({
+                    'Game': game, 'Model': model,
+                    'Temperature': float(condition.split('_')[1]),
+                    'Archived Games': len(flags), 'Illegal Games': illegal,
+                    'Illegal Game Fraction': illegal / len(flags) if flags else None,
+                    'Complete 100-game Archive': len(flags) == 100,
+                })
+    result = pd.DataFrame(rows)
+    print(result.to_string(index=False))
+    if args.out:
+        result.to_csv(args.out, index=False)
 
-# Display results
-print("Tic-Tac-Toe Probability of Incorrect Moves:", prob_incorrect_tictactoe)
-print("Tic-Tac-Toe Average Steps:", avg_steps_tictactoe)
 
-print("Connect Four Probability of Incorrect Moves:", prob_incorrect_connect_four)
-print("Connect Four Average Steps:", avg_steps_connect_four)
-
-print("Battleship Probability of Incorrect Moves:", prob_incorrect_battleship)
-print("Battleship Average Steps:", avg_steps_battleship)
+if __name__ == '__main__':
+    main()

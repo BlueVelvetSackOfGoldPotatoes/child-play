@@ -21,33 +21,42 @@ logger = logging.getLogger(__name__)
 
 load_dotenv()
 
-openai_api_key = os.environ.get("OPENAI_API_KEY")
-client = OpenAI(api_key=openai_api_key)
-
-# Hugging face imports
-from transformers import pipeline
+client = None
 
 def ask(api_messages, temperature, model):
-    origin = model.split(':')[0]
-    specific_model = model.split(':')[1]
-    
-    
-    # OpenAI
-    if origin == "oa":
-        text_prompt = "\n\n".join([message["role"] + ":\n" + message["content"] for message in api_messages])
-        completion = client.chat.completions.create(
-            model=specific_model,
-            messages=api_messages,
-            temperature=temperature
-        )
+    global client
+    origin, specific_model = model.split(':', 1)
 
+    if origin == "oa":
+        if client is None:
+            client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
+        params = {
+            "model": specific_model,
+            "messages": api_messages,
+        }
+
+        if specific_model.startswith(("o3", "o4")):
+            if temperature <= 0.5:
+                params["reasoning_effort"] = "low"
+            elif temperature == 1:
+                params["reasoning_effort"] = "medium"
+            else:
+                params["reasoning_effort"] = "high"
+        else:
+            params["temperature"] = temperature
+
+        completion = client.chat.completions.create(**params)
         response = completion.choices[0].message.content
 
     # Hugging Face
     elif origin == "hf":
+        from transformers import pipeline
         text_prompt = "\n\n".join([message["role"] + ":\n" + message["content"] for message in api_messages])
         pipe = pipeline("text-generation", model=specific_model)
-        result = pipe(text_prompt)
+        pipe_output = pipe(text_prompt)
+        if pipe_output is None:
+            raise RuntimeError("Hugging Face pipeline returned None")
+        result = list(pipe_output)
         full_text = result[0]['generated_text']
         
         response = full_text[len(text_prompt):]
@@ -77,7 +86,8 @@ def ask(api_messages, temperature, model):
     else:
         raise ValueError(f"Unknown origin: {origin}")
 
-    response = response.strip()
+    if response is not None:
+        response = response.strip()
 
     return response
 

@@ -1,0 +1,22 @@
+\begin{table}[tbp]
+\centering
+\small
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{lrrrrrrrr}
+\toprule
+Condition & BS & TTT & C4 & Shapes & LCL valid. & LCL gen. & GtS & Mean \\
+\midrule
+GPT-4o (0) & 0.00 & 85.00 & 79.00 & 95.67 & 98.00 & 100.00 & 5.00 & 66.10 \\
+GPT-4o-mini (0) & 0.00 & 60.00 & 80.00 & 47.67 & 50.00 & 0.00 & 1.00 & 34.10 \\
+Fable 5.2 & 0.00 & 35.00 & 37.00 & 100.00 & 53.00 & 100.00 & 45.00 & 52.86 \\
+Opus 5.5 & 2.00 & 85.00 & 21.00 & 97.67 & 66.00 & 100.00 & 20.00 & 55.95 \\
+Astra & 63.00 & 73.00 & 77.00 & 100.00 & 100.00 & 100.00 & 100.00 & 87.57 \\
+Sol & 56.00 & 62.00 & 75.00 & 100.00 & 100.00 & 100.00 & 99.00 & 84.57 \\
+Luna (0) & 1.00 & 68.00 & 80.00 & 99.33 & 85.00 & 100.00 & 4.00 & 62.48 \\
+Luna (0.5) & 1.00 & 69.00 & 80.00 & 99.67 & 77.00 & 100.00 & 3.00 & 61.38 \\
+Luna (1) & 1.00 & 73.00 & 78.00 & 99.33 & 80.00 & 96.00 & 2.00 & 61.33 \\
+\bottomrule
+\end{tabular}}
+\caption{Observed success percentages for every evaluated condition. Shapes uses 300 trials; each other task uses 100. The mean gives each task equal weight and includes invalid replies as failures in every task. Temperature is shown in parentheses where supplied. No setting is selected separately for individual tasks.}
+\label{tab:scores}
+\end{table}
